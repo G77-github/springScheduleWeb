@@ -12,6 +12,6 @@ public class EventParticipantsResponse {
 
     public EventParticipantsResponse(UserProfile userProfile) {
         this.userId = userProfile.getUserId();
-        this.userName = userProfile.getUserName();
+        this.userName = userProfile.getUName();
     }
 }

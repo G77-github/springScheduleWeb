@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Getter
 @Setter
@@ -28,7 +27,7 @@ public class EventDetailResponse {
         this.eventContent = event.getEventContent();
         this.eventStart = event.getEventStart();
         this.eventEnd = event.getEventEnd();
-        this.userName = userProfile.getUserName();
+        this.userName = userProfile.getUName();
     }
 
     public EventDetailResponse(Event event) {

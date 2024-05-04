@@ -5,12 +5,18 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.Collection;
+import java.util.List;
 
 @Entity
 @Table(name = "user_profile")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class UserProfile {
+public class UserProfile implements UserDetails {
 
 
     @Id
@@ -19,7 +25,7 @@ public class UserProfile {
     private Long userId;
 
     @Column(name = "user_name")
-    private String userName;
+    private String uName;
 
     @Column(name = "user_password")
     private String userPassword;
@@ -35,11 +41,47 @@ public class UserProfile {
 
 
     @Builder
-    public UserProfile(String userName, String userPassword, String userEmail, Boolean isVerified, Boolean userBan) {
-        this.userName = userName;
+    public UserProfile(String userName, String userPassword, String userEmail, Boolean isVerified, Boolean userBan, String auth) {
+        this.uName = userName;
         this.userPassword = userPassword;
         this.userEmail = userEmail;
         this.isVerified = isVerified;
         this.userBan = userBan;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority("user"));
+    }
+
+    @Override
+    public String getUsername() {
+        return userEmail;
+    }
+
+
+    @Override
+    public String getPassword() {
+        return userPassword;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 }

@@ -166,7 +166,7 @@ public class TeamService {
         for (Image image : imageList) {
 
             Optional<UserProfile> userProfile = userProfileRepository.findById(image.getUserId());
-            String userName = userProfile.get().getUserName();
+            String userName = userProfile.get().getUName();
 
 
             ImageResponse imageResponse = new ImageResponse(image, userName);

@@ -11,7 +11,7 @@
 
         
     <main class="form-account m-auto">
-        <form method="post" action="/register">
+        <form method="post" action="/signup">
 
             <img class="mb-4" src="../assets/brand/bootstrap-logo.svg" alt="" width="72" height="57">
             <h1 class="h3 mb-3 fw-normal">회원가입</h1>
@@ -19,7 +19,7 @@
             <div class="mb-1">
                 <label for="InputEmail" class="form-label">이메일</label>
                 <div class="d-flex flex-nowrap">
-                    <input type="email" class="form-control col col-lg-2" id="InputEmail" name="email" aria-describedby="emailHelp">
+                    <input type="email" class="form-control col col-lg-2" id="InputEmail" name="userEmail" aria-describedby="emailHelp">
                     <button class="btn btn-primary col col-lg-2 ms-2">중복 확인</button>
                 </div>
                 <div id="emailHelp" class="form-text">이메일 형식으로 작성</div>
@@ -29,19 +29,19 @@
             <div class="mb-2">
                 <label for="InputName" class="form-label">이름</label>
                 <div class="d-flex flex-nowrap">
-                    <input type="text" class="form-control col col-lg-2" id="InputName" name="name">
+                    <input type="text" class="form-control col col-lg-2" id="InputName" name="userName">
                     <button class="btn btn-primary col col-lg-2 ms-2">중복 확인</button>
                 </div>    
               </div>
 
             <div class="mb-2">
               <label for="InputPassword1" class="form-label">Password</label>
-              <input type="password" class="form-control" id="InputPassword1" name="password1">
+              <input type="password" class="form-control" id="InputPassword1" name="userPassword">
             </div>
 
             <div class="mb-2">
                 <label for="InputPassword2" class="form-label">Password 확인</label>
-                <input type="password" class="form-control" id="InputPassword2" name="password2">
+                <input type="password" class="form-control" id="InputPassword2" name="userPasswordCheck">
             </div>
             
             <div class="mt-5">

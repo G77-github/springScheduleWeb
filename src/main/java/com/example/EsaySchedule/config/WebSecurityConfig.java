@@ -1,8 +1,7 @@
-/*
 package com.example.EsaySchedule.config;
 
-
-import com.example.EsaySchedule.service.CustomUserDetailsService;
+import com.example.EsaySchedule.service.UserDetailService;
+import com.example.EsaySchedule.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,19 +16,19 @@ import org.springframework.security.web.SecurityFilterChain;
 @RequiredArgsConstructor
 public class WebSecurityConfig {
 
-    private final CustomUserDetailsService userDetailsService;
+    private final UserDetailService userService;
 
     @Bean
-    public WebSecurityCustomizer configure(){
-        return (web) -> web.ignoring()
-                .requestMatchers("/static/**");
+    public WebSecurityCustomizer configure() {
+        return (web -> web.ignoring()
+                .requestMatchers("/static/**"));
     }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
                 .authorizeRequests()
-                .requestMatchers("/login", "/register", "/error").permitAll()
+                .requestMatchers("/login", "/signup", "/user").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()
@@ -45,15 +44,15 @@ public class WebSecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(
-            HttpSecurity httpSecurity,
-            BCryptPasswordEncoder bCryptPasswordEncoder,
-            CustomUserDetailsService userDetailsService) throws Exception {
+    public AuthenticationManager authenticationManager(HttpSecurity httpSecurity
+            , BCryptPasswordEncoder bCryptPasswordEncoder
+            , UserDetailService userDetailService) throws Exception{
         return httpSecurity.getSharedObject(AuthenticationManagerBuilder.class)
-                .userDetailsService(userDetailsService)
+                .userDetailsService(userService)
                 .passwordEncoder(bCryptPasswordEncoder)
                 .and()
                 .build();
+
     }
 
     @Bean
@@ -61,4 +60,3 @@ public class WebSecurityConfig {
         return new BCryptPasswordEncoder();
     }
 }
-*/

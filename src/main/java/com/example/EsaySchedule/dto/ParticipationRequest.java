@@ -7,6 +7,6 @@ import lombok.Setter;
 @Setter
 public class ParticipationRequest {
 
-    private Long userId;
+    private Long teamId;
     private Long eventId;
 }

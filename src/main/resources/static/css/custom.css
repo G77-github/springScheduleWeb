@@ -1,0 +1,48 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+main {
+    margin-left: 270px;
+}
+
+.full-size {
+    width: 100%;
+    height: 100%;
+    padding: 0;
+}
+
+.font-size-big {
+    font-size: 30px;
+}
+
+.font-size-middle {
+    font-size: 20px;
+}
+
+.font-size-small {
+    font-size: 15px;
+}
+
+.fix-table {
+    width: 1200px;
+}
+
+.fix-width-long {
+    width: 1200px;
+}
+
+.fix-width-middle {
+    width: 700px;
+}
+
+.fix-width-short {
+    width: 200px;
+}
+
+.form-inline-item {
+    vertical-align: middle;
+    margin-bottom:0;
+}

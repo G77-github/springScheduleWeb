@@ -18,7 +18,7 @@ public class EventDetailResponse {
     private LocalDateTime eventEnd;
     private Boolean notEvent;
     private String userName;
-
+    private Long userId;
 
     public EventDetailResponse(Event event, UserProfile userProfile) {
         this.eventId = event.getEventId();
@@ -38,5 +38,6 @@ public class EventDetailResponse {
         this.eventStart = event.getEventStart();
         this.eventEnd = event.getEventStart();
         this.notEvent = event.getNotEvent();
+        this.userId = event.getUserId();
     }
 }

@@ -17,6 +17,7 @@ import org.springframework.security.web.SecurityFilterChain;
 public class WebSecurityConfig {
 
     private final UserDetailService userService;
+    private final CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
 
     @Bean
     public WebSecurityCustomizer configure() {
@@ -33,6 +34,7 @@ public class WebSecurityConfig {
                 .and()
                 .formLogin()
                 .loginPage("/login")
+                .successHandler(customAuthenticationSuccessHandler)
                 .defaultSuccessUrl("/main")
                 .and()
                 .logout()

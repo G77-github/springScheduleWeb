@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+    <head th:replace="~{fragments/commonSetting :: head}">
+    </head>
+
+    <body>
+        <div class="d-flex full-size">
+            <aside th:replace="~{fragments/common :: aside}"></aside>
+
+            <main class="full-size">
+                <div class="mt-5 ms-5 fix-width-long">
+                    <div class="font-size-big" th:text="${teamName}"></div>
+                    <div class="d-flex flex-row">
+                        <span class="font-size-big" th:text="${eventName}"></span>
+                        <button class="btn btn-secondary ms-3" id="addImageButton">이미지 추가</button>
+                        <input type="file" id="imageInput" multiple style="display:none;" onchange="uploadImages()">
+                    </div>
+                    <div class="row row-cols-5 g-3 mt-5">
+                        <div th:each="image:${imageList}" class="col">
+                            <div class="card">
+                                <img th:src="${image.imageUrl}" class="card-img-top">
+                                <div class="card-body d-flex flex-row-reverse">
+                                    <button class="btn btn-sm btn-secondary delete-button" th:data-image-id="${image.imageId}">삭제</button>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+        </div>
+
+
+        <script th:inline="javascript">
+            function uploadImages() {
+                var files = document.getElementById('imageInput').files;
+                var formData = new FormData();
+
+                for(var i =0; i < files.length; i++){
+                    formData.append("images", files[i]);
+                }
+
+                var teamId = /*[[${teamId}]]*/ 'teamId';
+                var eventId = /*[[${eventId}]]*/ 'eventId';
+
+                formData.append('teamId', teamId);
+                formData.append('eventId', eventId);
+
+                fetch('/uploadImage', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    if(response.ok){
+                        return response.json();
+                    } else {
+                        throw new Error('에러 발생');
+                    }
+                })
+                .then(data => {
+                    console.log(data);
+                    window.location.reload();
+                })
+                .catch(error => console.error('Error:', error));
+            }
+
+            document.getElementById('addImageButton').addEventListener('click', function () {
+                document.getElementById('imageInput').click();
+            });
+
+            $(document).ready( ()=>{
+                $('.delete-button').click( function() {
+                    var imageId = $(this).data('image-id');
+
+                    $.ajax({
+                        method: 'DELETE',
+                        url: "/deleteImage/" + imageId,
+                        success: ()=>{
+                            alert("삭제성공");
+                        },
+                        error: (xhr, status, error) =>{
+                            alert("삭제 실패");
+                        }
+                    });
+                });
+            });
+        </script>
+        <script th:replace="~{fragments/commonSetting :: boots-js}"></script>
+    </body>
+
+</html>

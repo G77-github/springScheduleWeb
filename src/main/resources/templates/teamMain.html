@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+    <head th:replace="~{fragments/commonSetting :: head}">
+    </head>
+
+    <body>
+        <div class="d-flex full-size">
+            <aside th:replace="~{fragments/common :: aside}"></aside>
+
+            <main class="full-size">
+                <div class="mt-5 ms-5">
+                    <div class="d-flex flex-row align-items-center">
+                        <span class="font-size-big" th:text="${teamName}"></span>
+                        <input type="checkbox" class="btn-check" id="bookmarkButton" th:checked="${bookmark == true}">
+
+
+
+
+
+                        <label class="btn btn-outline-warning ms-3" for="bookmarkButton">즐겨찾기</label>
+                    </div>
+                    <div>
+                        <h1>달력 들어갈 위치</h1>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <span class="font-size-big" mt-3>이벤트</span>
+                        <span class="ms-3"><a th:href="@{/team/{teamId}/createEvent(teamId = ${teamId})}" class="btn btn-dark">추가</a></span>
+                        <span class="ms-3"><a th:href="@{/team/{teamId}/pastEvent(teamId = ${teamId})}" class="btn btn-dark">지난 이벤트</a></span>
+                    </div>
+                    <table class="table fix-table mt-3">
+                        <thead>
+                            <tr class="table-dark">
+                                <th>이벤트</th>
+                                <th>장소</th>
+                                <th>시작시간</th>
+                                <th>종료시간</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="futureEventLabel : ${futureEventLabels}" th:data-team-id="${teamId}" th:data-event-id="${futureEventLabel.eventId}" onclick="goToEventPage(this)">
+                                <td th:text="${futureEventLabel.eventName}"></td>
+                                <td th:text="${futureEventLabel.eventPlace}"></td>
+                                <td th:text="${#temporals.format(futureEventLabel.eventStart, 'yyyy-MM-dd HH:mm')}"></td>
+                                <td th:text="${#temporals.format(futureEventLabel.eventEnd, 'yyyy-MM-dd HH:mm')}"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </main>
+
+        </div>
+
+        <script th:inline="javascript">
+            function goToEventPage(element) {
+                var teamId = element.getAttribute('data-team-id');
+                var eventId = element.getAttribute('data-event-id');
+                window.location.href='/team/' + teamId +'/event?eventId=' + eventId;
+            }
+
+            $(document).ready( ()=>{
+                $('#bookmarkButton').change( ()=>{
+                    var isChecked = $('#bookmarkButton').is(':checked');
+                    var teamId = /*[[${teamId}]]*/ 'teamId';
+                    var teamName = /*[[${teamName}]]*/ 'teamName';
+
+                    $.ajax({
+                        url: '/team/bookmark',
+                        type: isChecked ? 'POST' : 'DELETE',
+                        data: {
+                            teamId: teamId,
+                            teamName: teamName
+                        },
+                        contentType: "application/x-www-form-urlencoded",
+                        success: ()=>{
+                            alert('북마크 상태 변경 성공 이 알림창 나중에 삭제');
+                        },
+                        error: (xhr, status, error) =>{
+                            alert('북마크 상태 변경 실패');
+                        }
+                    });
+                });
+            });
+        </script>
+
+        <script th:replace="~{fragments/commonSetting :: boots-js}"></script>
+    </body>
+
+</html>

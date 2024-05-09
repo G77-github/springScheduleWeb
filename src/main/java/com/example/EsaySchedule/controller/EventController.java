@@ -1,7 +1,12 @@
 package com.example.EsaySchedule.controller;
 
 import com.example.EsaySchedule.dto.*;
+import com.example.EsaySchedule.entity.Event;
+import com.example.EsaySchedule.entity.Team;
+import com.example.EsaySchedule.entity.UserProfile;
 import com.example.EsaySchedule.service.EventService;
+import com.example.EsaySchedule.service.TeamService;
+import com.example.EsaySchedule.service.ValidationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 @Slf4j
@@ -18,17 +24,32 @@ import java.util.List;
 public class EventController {
 
     private final EventService eventService;
+    private final ValidationService validationService;
+    private final TeamService teamService;
 
-    @GetMapping("/createEvent")
-    public String createEvent() {
+    @GetMapping("/team/{teamId}/createEvent")
+    public String createEvent(@PathVariable("teamId")Long teamId, Model model) {
 
-        return "addSchedule";
+        UserProfile currentUser = validationService.getUserData();
+
+        if (currentUser == null) {
+            return "error";
+        }
+
+        String userName = currentUser.getUName();
+        model.addAttribute("userName", userName);
+
+        Optional<Team> teamByTeamId = teamService.findTeamByTeamId(teamId);
+        model.addAttribute("teamId", teamByTeamId.get().getTeamId());
+        model.addAttribute("teamName", teamByTeamId.get().getTeamName());
+
+
+        return "addEvent";
     }
 
-    @PostMapping("/createEvent")
-    public String createEvent(@ModelAttribute AddEventRequest eventRequest) {
+    @PostMapping("/team/{teamId}/createEvent")
+    public String createEvent(@PathVariable("teamId")Long teamId, @ModelAttribute AddEventRequest eventRequest) {
 
-        log.info("userId = {}", eventRequest.getUserId());
         log.info("teamId={}", eventRequest.getTeamId());
         log.info("evnetName={}", eventRequest.getEventName());
         log.info("eventContent={}", eventRequest.getEventContent());
@@ -37,14 +58,36 @@ public class EventController {
         log.info("end={}", eventRequest.getEventEnd());
         log.info("notevent={}", eventRequest.getNotEvent());
 
+        UserProfile currentUser = validationService.getUserData();
+
+        if (currentUser == null) {
+            return "error";
+        }
+
+        Long userId = currentUser.getUserId();
+        eventRequest.setUserId(userId);
+
+        if (validationService.userTeamJoinCheck(userId, teamId)) {
+            log.info("팀에 가입되어있지 않은 유저임");
+            return "error";
+        }
+
         if (eventRequest.getEventStart().isAfter(eventRequest.getEventEnd())) {
             log.info("종료일이 시작일보다 빠름");
-            return "redirect:/createEvent";
+            return "error";
+        }
+
+        if (eventRequest.getEventName() == null || eventRequest.getEventStart() == null || eventRequest.getEventPlace() == null || eventRequest.getEventContent() == null) {
+            log.info("필수값들이 입력되지 않음");
+            return "error";
         }
         eventRequest.setEventRegistration(LocalDateTime.now());
-        eventService.save(eventRequest);
+        Event saveEvent = eventService.save(eventRequest);
 
-        return "redirect:/createEvent";
+        eventService.saveEventJoin(userId, saveEvent.getEventId());
+
+
+        return "redirect:/team/" + teamId;
 
     }
 
@@ -66,11 +109,23 @@ public class EventController {
     @GetMapping("/team/{teamId}/event")
     public String viewEvent(@PathVariable(name = "teamId") Long teamId, @RequestParam("eventId") Long eventId, Model model) {
 
-        Long userId = 1L; //임시값
+
+        UserProfile currentUser = validationService.getUserData();
+
+        if (currentUser == null) {
+            return "error";
+        }
+
+        Long userId = currentUser.getUserId();
+        model.addAttribute("userId", userId);
+        model.addAttribute("userName", currentUser.getUName());
 
         EventDetailResponse eventDetail = eventService.findEventDetail(eventId, userId);
-
         model.addAttribute("eventDetail", eventDetail);
+
+        Optional<Team> teamByTeamId = teamService.findTeamByTeamId(teamId);
+
+        model.addAttribute("teamName", teamByTeamId.get().getTeamName());
         model.addAttribute("teamId", teamId);
 
         List<EventParticipantsResponse> participants = eventService.findEventParticipants(eventId);
@@ -79,9 +134,7 @@ public class EventController {
 
         Boolean userParticipateCheck = eventService.userParticipateCheck(eventId, userId);
         model.addAttribute("userParticipate", userParticipateCheck);
-        log.info("유저 참가 확인={}", userParticipateCheck);
 
-        model.addAttribute("userId", userId);
 
 
         return "viewEvent";
@@ -90,6 +143,18 @@ public class EventController {
     @DeleteMapping("/team/{teamId}/event")
     @ResponseBody
     public ResponseEntity<?> deleteEvent(@PathVariable(name = "teamId") Long teamId, @RequestParam(name = "eventId") Long eventId) {
+
+        UserProfile currentUser = validationService.getUserData();
+
+        if (currentUser == null) {
+            return ResponseEntity.badRequest().body("이벤트 삭제중 오류 발생");
+        }
+
+        Long userId = currentUser.getUserId();
+        Event eventById = eventService.findEventById(eventId);
+        if (!userId.equals(eventById.getUserId())) {
+            return ResponseEntity.badRequest().body("작성자가 아님");
+        }
 
         try {
             eventService.deleteEvent(eventId);
@@ -102,8 +167,23 @@ public class EventController {
     @GetMapping("/team/{teamId}/eventEdit")
     public String editEvent(@PathVariable(name = "teamId") Long teamId, @RequestParam(name = "eventId") Long eventId, Model model) {
 
-        Long userId = 1L; //임시값
+        UserProfile currentUser = validationService.getUserData();
+
+        if (currentUser == null) {
+            return "error";
+        }
+
+        Long userId = currentUser.getUserId();
         EventDetailResponse eventDetail = eventService.findEventDetail(eventId);
+
+        log.info("오류위치 확인1");
+        log.info("userId={}", userId.getClass().getName());
+        log.info("EuserId={}", eventDetail.getUserId().getClass().getName());
+
+        if (!userId.equals(eventDetail.getUserId())) {
+            return "error";
+        }
+
         model.addAttribute("eventDetail", eventDetail);
         model.addAttribute("teamId", teamId);
 
@@ -113,6 +193,18 @@ public class EventController {
 
     @PostMapping("/team/{teamId}/eventEdit")
     public String editEvent(@PathVariable(name = "teamId") Long teamId, @RequestParam(name = "eventId") Long eventId, @ModelAttribute EditEventRequest eventRequest) {
+
+        UserProfile currentUser = validationService.getUserData();
+
+        if (currentUser == null) {
+            return "error";
+        }
+
+        Long userId = currentUser.getUserId();
+        Event eventById = eventService.findEventById(eventId);
+        if (!userId.equals(eventById.getUserId())) {
+            return "error";
+        }
 
         if (eventRequest.getEventStart().isAfter(eventRequest.getEventEnd())) {
             log.info("종료일이 시작일보다 빠름");
@@ -128,11 +220,25 @@ public class EventController {
     @ResponseBody
     public ResponseEntity<?> addParticipation(@RequestBody ParticipationRequest participationRequest) {
 
-        //참가 로직 구현
-        log.info("참가~~~~~~");
-        log.info("userId={}, eventId={}", participationRequest.getUserId(), participationRequest.getEventId());
-        Long userId = participationRequest.getUserId();
+
+        UserProfile currentUser = validationService.getUserData();
+
+        if (currentUser == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Long userId = currentUser.getUserId();
         Long eventId = participationRequest.getEventId();
+
+        Event eventById = eventService.findEventById(eventId);
+        if (eventById == null) {
+            return ResponseEntity.notFound().build();
+        }
+        Long teamId = eventById.getTeamId();
+
+        if (validationService.userTeamJoinCheck(userId, teamId)) {
+            return ResponseEntity.notFound().build();
+        }
 
         eventService.saveEventJoin(userId, eventId);
 
@@ -143,12 +249,24 @@ public class EventController {
     @ResponseBody
     public ResponseEntity<?> removeParticipation(@RequestBody ParticipationRequest participationRequest) {
 
-        //참가 취소 로직 구현
-        log.info("참가취소~~~~~~~");
-        log.info("userId={}, eventId={}", participationRequest.getUserId(), participationRequest.getEventId());
+        UserProfile currentUser = validationService.getUserData();
 
-        Long userId = participationRequest.getUserId();
+        if (currentUser == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Long userId = currentUser.getUserId();
         Long eventId = participationRequest.getEventId();
+
+        Event eventById = eventService.findEventById(eventId);
+        if (eventById == null) {
+            return ResponseEntity.notFound().build();
+        }
+        Long teamId = eventById.getTeamId();
+
+        if (validationService.userTeamJoinCheck(userId, teamId)) {
+            return ResponseEntity.notFound().build();
+        }
 
         eventService.deleteEventJoin(userId, eventId);
 

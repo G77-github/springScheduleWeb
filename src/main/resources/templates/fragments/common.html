@@ -1,0 +1,35 @@
+<div th:fragment="aside" class="d-flex flex-column flex-shrink-0 p-3 text-bg-dark" style="width: 260px; position: fixed; height: 100vh; top: 0">
+    <a href="/main" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+        <span class="font-size-big">ESA</span>
+    </a>
+    <hr>
+    <ul class="nav nav-pills flex-column mb-auto">
+        <li class="ms-0">
+            <a href="/search" class="nav-link text-white ps-0">
+                <span class="font-size-middle">검색</span>
+            </a>
+        </li>
+        <li class="mt-2">
+            <span class="font-size-middle">즐겨찾기</span>
+        </li>
+
+        <li th:each="bookMark : ${bookMarks}">
+            <a th:href="@{|/${bookMark.url}|}" class="nav-link text-white">
+                <span th:text="${bookMark.name}"></span>
+            </a>
+        </li>
+    </ul>
+    <hr>
+    <div class="dropdown">
+        <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+            <strong th:text="${userName}"></strong>
+        </a>
+        <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
+            <li><a class="dropdown-item" href="createTeam">그룹 생성</a> </li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="#">사용자 설정</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="/logout">로그아웃</a></li>
+        </ul>
+    </div>
+</div>

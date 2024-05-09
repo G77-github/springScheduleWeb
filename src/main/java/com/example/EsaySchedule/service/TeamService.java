@@ -22,6 +22,7 @@ public class TeamService {
     private final TeamJoinRepository teamJoinRepository;
     private final UserProfileRepository userProfileRepository;
     private final ImageRepository imageRepository;
+    private final BookmarkRepository bookmarkRepository;
 
     public Team save(AddTeamRequest addTeamRequest) {
         return teamRepository.save(addTeamRequest.toEntity());
@@ -105,6 +106,17 @@ public class TeamService {
         teamJoinRepository.save(teamJoin);
     }
 
+    @Transactional
+    public void joinTeam(Long userId, Long teamId, boolean approval) {
+        TeamJoin teamJoin = TeamJoin.builder()
+                                    .userId(userId)
+                                    .teamId(teamId)
+                                    .approval(approval)
+                                    .userBlock(false)
+                                    .build();
+        teamJoinRepository.save(teamJoin);
+    }
+
     public void joinTeamAutoApproval(Long userId, Long teamId) {
         TeamJoin teamJoin = TeamJoin.builder()
                                     .userId(userId)
@@ -146,7 +158,7 @@ public class TeamService {
         teamRepository.save(team);
     }
 
-    public void ImageInfoSave(Long userId, Long teamId, Long eventId, String url) {
+    public void imageInfoSave(Long userId, Long teamId, Long eventId, String url) {
         Image image = Image.builder()
                 .teamId(teamId)
                 .userId(userId)
@@ -187,5 +199,36 @@ public class TeamService {
         return true;
     }
 
+
+    public Long findTeamMasterId(Long teamId) {
+        Optional<Team> team = teamRepository.findById(teamId);
+        Long teamMasterId = team.get().getTeamMasterId();
+
+        return teamMasterId;
+    }
+
+
+    public void addBookmark(Long userId, Long teamId, String teamName) {
+        Bookmark bookmark = new Bookmark(userId, teamId, teamName);
+
+        bookmarkRepository.save(bookmark);
+
+    }
+
+    @Transactional
+    public void deleteBookmark(Long userId, Long teamId) {
+
+        bookmarkRepository.deleteById(new BookmarkPK(userId, teamId));
+
+    }
+
+    public List<Bookmark> findUserBookMarks(Long userId) {
+        List<Bookmark> bookmarkByUserId = bookmarkRepository.findBookmarkByUserId(userId);
+        return bookmarkByUserId;
+    }
+
+    public Optional<Bookmark> findBookMarkByUserIdAndTeamId(Long userId, Long teamId) {
+        return bookmarkRepository.findById(new BookmarkPK(userId, teamId));
+    }
 
 }

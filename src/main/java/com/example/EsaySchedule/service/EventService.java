@@ -44,8 +44,12 @@ public class EventService {
         return eventRepository.findByTeamId(teamId);
     }
 
-    public List<Event> findEventByTeamId(Long teamId) {
-        return eventRepository.findByTeamIdAndNotEventFalse(teamId);
+    public List<Event> findFutureEventByTeamId(Long teamId, LocalDateTime now) {
+        return eventRepository.findFutureEventByTeamIdAndNotEventFalse(teamId, now);
+    }
+
+    public List<Event> findPastEventByTeamId(Long teamId, LocalDateTime now) {
+        return eventRepository.findPastEventByTeamIdAndNotEventFalse(teamId, now);
     }
 
     public List<EventLabelResponse> EventToEventLabel(List<Event> events) {
@@ -61,7 +65,7 @@ public class EventService {
         List<EventAndTeamLabelResponse> result = new ArrayList<>();
 
         for (EventJoin join : eventJoins) {
-            Event event = eventRepository.findById(join.getEventId()).orElse(null);
+            Event event = eventRepository.findFutureEventById(join.getEventId(), LocalDateTime.now()).orElse(null);
             if (event != null) {
                 Team team = teamRepository.findById(event.getTeamId()).orElse(null);
 
@@ -83,8 +87,9 @@ public class EventService {
     public List<EventAndTeamLabelResponse> findNewEvent(Long userId) {
 
         List<Long> teamIds = teamJoinRepository.findApprovedAndNotBlockedTeamIdsByUserId(userId);
-        List<Event> eventsByTeamIds = eventRepository.findByTeamIdAndNotEventFalse(teamIds);
-        LocalDateTime twoDaysAgo = LocalDateTime.now().minusDays(2);
+        LocalDateTime now = LocalDateTime.now();
+        List<Event> eventsByTeamIds = eventRepository.findFutureEventByTeamIdAndNotEventFalse(teamIds, now);
+        LocalDateTime twoDaysAgo = now.minusDays(2);
         List<Event> newEventsByTeamIds = eventsByTeamIds.stream().filter(event -> event.getEventRegistration().isAfter(twoDaysAgo)).toList();
         List<EventAndTeamLabelResponse> result = new ArrayList<>();
 
@@ -182,11 +187,11 @@ public class EventService {
         return event;
     }
 
-    public List<Event> findEventByDate(Long teamId,Integer year, Integer month) {
+    public List<Event> findEventByDate(Long teamId,Integer year, Integer month, LocalDateTime now) {
         if (month == 0) {
-            return eventRepository.findByYear(teamId, year);
+            return eventRepository.findByYear(teamId, year, now);
         } else {
-            return eventRepository.findByYearAndMonth(teamId, year, month);
+            return eventRepository.findByYearAndMonth(teamId, year, month, now);
         }
 
     }

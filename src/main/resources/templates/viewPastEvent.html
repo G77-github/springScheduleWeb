@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+    <head th:replace="~{fragments/commonSetting :: head}">
+    </head>
+
+    <body>
+        <div class="d-flex full-size">
+            <aside th:replace="~{fragments/common :: aside}"></aside>
+
+            <main class="full-size">
+                <div class="mt-5 ms-5 fix-width-long">
+                    <div class="font-size-big" th:text="${teamName}"></div>
+                    <div class="font-size-big mt-3">지난 이벤트</div>
+                    <div class="d-flex flex-row mt-3 align-items-center">
+                        <select class="form-select w-auto" id="year-select">
+                            <option value="2024">2024</option>
+                        </select>
+                        <select class="form-select ms-2 w-auto" id="month-select">
+                            <option value="0">전체</option>
+                            <option value="1">1월</option>
+                            <option value="2">2월</option>
+                            <option value="3">3월</option>
+                            <option value="4">4월</option>
+                            <option value="5">5월</option>
+                            <option value="6">6월</option>
+                            <option value="7">7월</option>
+                            <option value="8">8월</option>
+                            <option value="9">9월</option>
+                            <option value="10">10월</option>
+                            <option value="11">11월</option>
+                            <option value="12">12월</option>
+                        </select>
+                        <button class="btn btn-dark w-auto ms-3" id="date-select-button">조회</button>
+                    </div>
+
+                    <table class="table mt-3">
+                        <thead>
+                            <tr class="table-dark">
+                                <th>이벤트</th>
+                                <th>날짜</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="eventLabel : ${eventLabels}" th:data-team-id="${teamId}" th:data-event-id="${eventLabel.eventId}" onclick="goToImagePage(this)">
+                                <td th:text="${eventLabel.eventName}"></td>
+                                <td th:text="${#temporals.format(eventLabel.eventStart, 'yyyy-MM-dd')}"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </main>
+
+        </div>
+
+        <script th:inline="javascript">
+            document.getElementById('date-select-button').addEventListener('click', ()=>{
+                var teamId = /*[[${teamId}]]*/ 'teamId';
+                var year = document.getElementById('year-select').value;
+                var month = document.getElementById('month-select').value;
+
+                var url = `/team/${teamId}/pastEvent?year=${year}&month=${month}`;
+
+                window.location.href = url;
+            });
+
+            function goToImagePage(element) {
+                var teamId = element.getAttribute('data-team-id');
+                var eventId = element.getAttribute('data-event-id');
+                window.location.href='/team/' + teamId +'/imageBoard?eventId=' + eventId;
+            }
+        </script>
+        <script th:replace="~{fragments/commonSetting :: boots-js}"></script>
+    </body>
+
+</html>

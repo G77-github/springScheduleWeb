@@ -13,6 +13,9 @@ public interface EventJoinRepository extends JpaRepository<EventJoin, Long> {
 
     List<EventJoin> findByUserId(Long userId);
 
+    @Query("SELECT ej.eventId FROM EventJoin ej WHERE ej.userId =:userId")
+    List<Long> findEventIdsByUserId(@Param("userId") Long userId);
+
     @Query("SELECT ej.userId FROM EventJoin ej WHERE ej.eventId = :eventId")
     List<Long> findUserIdByEventId(@Param("eventId") Long eventId);
 

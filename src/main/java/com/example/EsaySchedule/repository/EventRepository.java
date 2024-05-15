@@ -33,4 +33,6 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     @Query("SELECT e FROM Event e WHERE e.eventId =:eventId AND e.eventStart >:now AND e.notEvent = FALSE")
     Optional<Event> findFutureEventById(@Param("eventId") Long eventId, @Param("now") LocalDateTime now);
 
+    List<Event> findByEventIdIn(List<Long> eventIds);
+
 }

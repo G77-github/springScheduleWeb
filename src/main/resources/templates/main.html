@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
-    <head th:replace="~{fragments/commonSetting :: head}">
+    <head th:replace="~{fragments/commonSetting :: headUseCal}">
     </head>
 
     <body>
@@ -8,6 +8,9 @@
             <aside th:replace="~{fragments/common :: aside}"></aside>
 
             <main class="full-size">
+                <div class="ms-5 mt-5 fix-width-long">
+                    <div id='calendar'></div>
+                </div>
                 <div class="ms-5 mt-5">
                     <span class="font-size-big">참여할 이벤트</span>
                     <table class="table fix-table">

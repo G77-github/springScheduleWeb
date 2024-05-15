@@ -56,8 +56,8 @@ public class EventService {
         return events.stream().map(EventLabelResponse::new).toList();
     }
 
-    public List<EventJoin> findEventJoinByUserId(Long userId) {
-        return eventJoinRepository.findByUserId(userId);
+    public List<Long> findEventJoinByUserId(Long userId) {
+        return eventJoinRepository.findEventIdsByUserId(userId);
     }
 
     public List<EventAndTeamLabelResponse> findEventsAndTeamsByUserId(Long userId) {
@@ -194,5 +194,9 @@ public class EventService {
             return eventRepository.findByYearAndMonth(teamId, year, month, now);
         }
 
+    }
+
+    public List<Event> findEventsByUserId(List<Long> eventIds) {
+        return eventRepository.findByEventIdIn(eventIds);
     }
 }

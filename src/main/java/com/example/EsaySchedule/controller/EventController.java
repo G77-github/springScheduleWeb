@@ -2,6 +2,7 @@ package com.example.EsaySchedule.controller;
 
 import com.example.EsaySchedule.dto.*;
 import com.example.EsaySchedule.entity.Event;
+import com.example.EsaySchedule.entity.EventJoin;
 import com.example.EsaySchedule.entity.Team;
 import com.example.EsaySchedule.entity.UserProfile;
 import com.example.EsaySchedule.service.EventService;
@@ -15,6 +16,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -271,5 +273,23 @@ public class EventController {
         eventService.deleteEventJoin(userId, eventId);
 
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/event/cal")
+    @ResponseBody
+    public List<FullCalDto> findJoinEvent() {
+        UserProfile currentUser = validationService.getUserData();
+
+        if (currentUser == null) {
+            return Collections.emptyList();
+        }
+
+        Long userId = currentUser.getUserId();
+        List<Long> joinList = eventService.findEventJoinByUserId(userId);
+        List<Event> joinEventList = eventService.findEventsByUserId(joinList);
+        List<FullCalDto> eventData = joinEventList.stream().map(FullCalDto::new).toList();
+
+        return eventData;
+
     }
 }

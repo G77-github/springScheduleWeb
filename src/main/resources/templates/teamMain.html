@@ -1,26 +1,21 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
-    <head th:replace="~{fragments/commonSetting :: head}">
+    <head th:replace="~{fragments/commonSetting :: headUseCal}">
     </head>
 
     <body>
         <div class="d-flex full-size">
             <aside th:replace="~{fragments/common :: aside}"></aside>
-
+            <div id="teamId" th:data-team-id="${teamId}"></div>
             <main class="full-size">
                 <div class="mt-5 ms-5">
                     <div class="d-flex flex-row align-items-center">
                         <span class="font-size-big" th:text="${teamName}"></span>
                         <input type="checkbox" class="btn-check" id="bookmarkButton" th:checked="${bookmark == true}">
-
-
-
-
-
                         <label class="btn btn-outline-warning ms-3" for="bookmarkButton">즐겨찾기</label>
                     </div>
-                    <div>
-                        <h1>달력 들어갈 위치</h1>
+                    <div class="fix-width-long">
+                        <div id='calendar'></div>
                     </div>
                     <div class="d-flex align-items-center">
                         <span class="font-size-big" mt-3>이벤트</span>
@@ -84,6 +79,7 @@
         </script>
 
         <script th:replace="~{fragments/commonSetting :: boots-js}"></script>
+        <script th:replace="~{fragments/commonSetting :: team-main-cal}"></script>
     </body>
 
 </html>

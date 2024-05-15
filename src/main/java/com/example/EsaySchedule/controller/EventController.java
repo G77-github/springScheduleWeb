@@ -18,7 +18,10 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Controller
 @Slf4j
@@ -275,7 +278,7 @@ public class EventController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/event/cal")
+    @GetMapping("/event/my")
     @ResponseBody
     public List<FullCalDto> findJoinEvent() {
         UserProfile currentUser = validationService.getUserData();
@@ -290,6 +293,32 @@ public class EventController {
         List<FullCalDto> eventData = joinEventList.stream().map(FullCalDto::new).toList();
 
         return eventData;
+
+    }
+
+    @GetMapping("/event/team/{teamId}")
+    @ResponseBody
+    public List<FullCalDto> findTeamEventAndJoin(@PathVariable("teamId")Long teamId) {
+        UserProfile currentUser = validationService.getUserData();
+
+        if (currentUser == null) {
+            return Collections.emptyList();
+        }
+        Long userId = currentUser.getUserId();
+
+        List<Event> events = eventService.findEventByTeamId(teamId);
+        List<Long> joinList = eventService.findEventJoinByUserId(userId);
+        Map<Boolean, List<Event>> splitEvent = events.stream()
+                .collect(Collectors.partitioningBy(event -> joinList.contains(event.getEventId())));
+        List<Event> joinTeamEvent = splitEvent.get(true);
+        List<Event> notJoinTeamEvent = splitEvent.get(false);
+
+        List<FullCalDto> list1 = joinTeamEvent.stream().map(event -> new FullCalDto(event, "rgb(33,37,41)")).toList();
+        List<FullCalDto> list2 = notJoinTeamEvent.stream().map(event -> new FullCalDto(event, "rgb(127,127,127")).toList();
+
+        List<FullCalDto> teamEventList = Stream.concat(list1.stream(), list2.stream()).collect(Collectors.toList());
+        return teamEventList;
+
 
     }
 }

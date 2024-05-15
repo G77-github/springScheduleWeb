@@ -44,6 +44,10 @@ public class EventService {
         return eventRepository.findByTeamId(teamId);
     }
 
+    public List<Event> findEventByTeamId(Long teamId) {
+        return eventRepository.findByTeamIdAndNotEventFalse(teamId);
+    }
+
     public List<Event> findFutureEventByTeamId(Long teamId, LocalDateTime now) {
         return eventRepository.findFutureEventByTeamIdAndNotEventFalse(teamId, now);
     }

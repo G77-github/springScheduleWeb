@@ -25,4 +25,12 @@ public class FullCalDto {
         }
     }
 
+    public FullCalDto(Event event, String backgroundColor) {
+        this.id = event.getEventId().toString();
+        this.title = event.getEventName();
+        this.start = event.getEventStart().toString();
+        this.end = event.getEventEnd().toString();
+        this.backgroundColor = backgroundColor;
+        this.borderColor = "white";
+    }
 }

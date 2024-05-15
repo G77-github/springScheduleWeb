@@ -16,15 +16,63 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
     <link rel="stylesheet" href="/css/custom.css">
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
+
+</head>
+
+<script th:fragment="main-cal">
+    document.addEventListener('DOMContentLoaded', function() {
             var calendarEl = document.getElementById('calendar');
             var calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'dayGridMonth',
                 contentHeight: 500,
-                events: '/event/cal'
+                events: '/event/my'
             });
-            calendar.render();
+        calendar.render();
+    });
+</script>
+
+<script th:fragment="team-main-cal">
+    document.addEventListener('DOMContentLoaded', function() {
+        var teamId = document.getElementById('teamId').getAttribute('data-team-id');
+        var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            contentHeight: 500,
+            customButtons:{
+                teamButton: {
+                    text: 'Team',
+                    click: function() {
+                        fetchEvents('/event/team/' + teamId);
+                    }
+                },
+                myButton: {
+                    text:'My',
+                    click: function() {
+                        fetchEvents('/event/my');
+                    }
+                }
+            },
+            headerToolbar: {
+                left: 'title',
+
+                right: 'teamButton myButton today prev,next'
+            },
+            events: '/event/team/' + teamId
         });
-    </script>
-</head>
+        calendar.render();
+
+        function fetchEvents(url) {
+            fetch(url)
+                .then(function(response) {
+                    return response.json();
+                })
+                .then(function(eventData) {
+                    calendar.removeAllEvents();
+                    calendar.addEventSource(eventData);
+                })
+                .catch(function(error) {
+                    console.error('err fetching event ', error);
+                });
+        }
+    });
+</script>

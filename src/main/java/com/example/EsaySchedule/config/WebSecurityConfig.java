@@ -45,6 +45,8 @@ public class WebSecurityConfig {
                 .build();
     }
 
+
+
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity httpSecurity
             , BCryptPasswordEncoder bCryptPasswordEncoder

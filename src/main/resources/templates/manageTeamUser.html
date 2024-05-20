@@ -11,12 +11,12 @@
                 <div class="mt-5 ms-5">
                     <span class="font-size-big" th:text="${teamName}"></span>
                     <div>
-                        <span><a><button class="btn btn-secondary">팀 관리</button> </a></span>
-                        <span><a><button class="btn btn-secondary">유저 관리</button> </a></span>
+                        <span><a class="btn btn-secondary" th:href="@{/team/{teamId}/teamManage(teamId=${teamId})}">팀 관리</a></span>
+                        <span><a class="btn btn-secondary" th:href="@{/team/{teamId}/userManage(teamId=${teamId})}">유저 관리</a></span>
                     </div>
 
                     <span class="font-size-big">가입 신청</span>
-                    <table class="table table-fix">
+                    <table class="table fix-table">
                         <thead>
                             <tr class="table-dark">
                                 <th>Name</th>
@@ -26,8 +26,8 @@
                         </thead>
                         <tbody>
                             <tr th:each="waitingUser : ${waitingUsers}">
-                                <td th:text="waitingUser.userName"></td>
-                                <td th:text="waitingUser.userEmail"></td>
+                                <td th:text="${waitingUser.userName}"></td>
+                                <td th:text="${waitingUser.userEmail}"></td>
                                 <td><button class="btn btn-secondary btn-sm approval-button" th:data-waiting-user-id="${waitingUser.userId}">승인</button> </td>
                             </tr>
                         </tbody>
@@ -76,7 +76,7 @@
 
         <script th:inline="javascript">
             $(document).ready( ()=>{
-                $(.approval-button').click( function() {
+                $('.approval-button').click( function() {
                     var waitingUserId = $(this).data('waiting-user-id');
                     var teamId = [[${teamId}]];
                     $.ajax({

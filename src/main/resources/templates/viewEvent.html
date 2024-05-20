@@ -10,10 +10,14 @@
             <main class="full-size">
                 <div class="mt-5 ms-5 d-flex flex-row">
                     <div class="fix-width-middle">
-                        <div class="font-size-big" th:text="${teamName}"></div>
+                        <a class="font-size-big font-fix-black" th:text="${teamName}" th:href="@{/team/{teamId}(teamId = ${teamId})}">
+                        </a>
 
                         <div class="d-flex flex-row justify-content-between align-items-center mt-3">
-                            <div class="font-size-big" th:text="${eventDetail.eventName}"></div>
+                            <div class="d-flex align-items-center">
+                                <span class="font-size-big" th:text="${eventDetail.eventName}"></span>
+                                <a class="btn btn-dark ms-1" th:href="@{/team/{teamId}/imageBoard(teamId=${teamId}, eventId=${eventDetail.eventId})}">사진 게시판</a>
+                            </div>
                             <div>
                                 <a class="btn btn-secondary" th:href="@{/team/{teamId}/eventEdit(teamId = ${teamId}, eventId=${eventDetail.eventId})}">수정</a>
                                 <button class="btn btn-secondary" th:attr="data-team-id=${teamId}, data-event-id=${eventDetail.eventId}" onclick="deleteEvent(this)">삭제</button>
@@ -39,7 +43,7 @@
                         <div class="d-flex justify-content-between align-items-center">
                             <span class="font-size-middle">참여 여부</span>
                             <span>
-                                <input type="checkbox" class="btn-check" id="userParticipation" th:checked="${userParticipate == true}">
+                                <input type="checkbox" class="btn-check" id="userParticipation" th:checked="${userParticipate == true}" th:disabled="${participateDisable}">
                                 <label class="btn btn-outline-dark ms-1" for="userParticipation">참가</label>
                             </span>
                         </div>

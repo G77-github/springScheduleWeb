@@ -11,6 +11,7 @@ public class FullCalDto {
     private String end;
     private String backgroundColor;
     private String borderColor;
+    private String display = "block";
 
     public FullCalDto(Event event) {
         this.id = event.getEventId().toString();

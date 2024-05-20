@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
-    <head th:replace="~{fragments/commonSetting :: headUseCal}">
+    <head th:replace="~{fragments/commonSetting :: head}">
     </head>
 
     <body>
@@ -13,6 +13,7 @@
                         <span class="font-size-big" th:text="${teamName}"></span>
                         <input type="checkbox" class="btn-check" id="bookmarkButton" th:checked="${bookmark == true}">
                         <label class="btn btn-outline-warning ms-3" for="bookmarkButton">즐겨찾기</label>
+                        <a class="ms-2" th:href="@{/team/{teamId}/teamManage(teamId=${teamId})}" ><i class="bi bi-gear fs-1"></i></a>
                     </div>
                     <div class="fix-width-long">
                         <div id='calendar'></div>

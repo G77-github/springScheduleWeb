@@ -67,6 +67,9 @@ public class TeamController {
         List<TeamResponse> joinTeams = teamService.findUserTeams(userId);
         model.addAttribute("joinTeams", joinTeams);
 
+        List<Bookmark> userBookMarks = teamService.findUserBookMarks(userId);
+        model.addAttribute("userBookMarks", userBookMarks);
+
         //전체 팀 출력(일반인 쓸일 없고 웹 관리자만 쓸것 삭제하기 애매해서 둠)(기억)
 /*        List<TeamResponse> teams = teamService.findAllTeam().stream()
                 .map(TeamResponse::new)
@@ -126,12 +129,15 @@ public class TeamController {
         String userName = currentUser.getUName();
         model.addAttribute("userId", userId);
         model.addAttribute("userName", userName);
+        model.addAttribute("teamId", teamId);
 
         Long masterId = teamService.findTeamMasterId(teamId);
 
-        if (userId != masterId) {
+
+        if (!userId.equals(masterId)) {
             return "redirect:/team/" + teamId;
         }
+
 
         Optional<Team> optionalTeam = teamService.findTeamByTeamId(teamId);
         Team team = optionalTeam.get();
@@ -153,7 +159,7 @@ public class TeamController {
         Long userId = currentUser.getUserId();
         Long masterId = teamService.findTeamMasterId(teamId);
 
-        if (userId != masterId) {
+        if (!userId.equals(masterId)) {
             return "redirect:/team/" + teamId;
         }
 
@@ -178,11 +184,16 @@ public class TeamController {
 
         Long masterId = teamService.findTeamMasterId(teamId);
 
-        if (userId != masterId) {
+        if (!userId.equals(masterId)) {
             return "redirect:/team/" + teamId;
         }
 
         List<UserLabelResponse> waitingToJoinUsers = teamService.waitingToJoinUser(teamId);
+
+        for (UserLabelResponse i : waitingToJoinUsers) {
+            log.info(i.getUserName());
+        }
+
         model.addAttribute("waitingUsers", waitingToJoinUsers);
 
         model.addAttribute("teamId", teamId);
@@ -287,7 +298,7 @@ public class TeamController {
         Long userId = currentUser.getUserId();
         Long masterId = teamService.findTeamMasterId(teamId);
 
-        if (userId != masterId) {
+        if (!userId.equals(masterId)) {
             return ResponseEntity.notFound().build();
         }
 
@@ -303,14 +314,17 @@ public class TeamController {
         UserProfile currentUser = validationService.getUserData();
 
         if (currentUser == null) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.badRequest().build();
         }
 
         Long userId = currentUser.getUserId();
         Long masterId = teamService.findTeamMasterId(teamId);
 
-        if (userId != masterId) {
-            return ResponseEntity.notFound().build();
+        if (!userId.equals(masterId)) {
+            return ResponseEntity.badRequest().build();
+        }
+        if (masterId.equals(teamUserId)) {
+            return ResponseEntity.badRequest().build();
         }
 
         teamService.blockTeamUser(teamUserId, teamId);
@@ -331,7 +345,7 @@ public class TeamController {
         Long userId = currentUser.getUserId();
         Long masterId = teamService.findTeamMasterId(teamId);
 
-        if (userId != masterId) {
+        if (!userId.equals(masterId)) {
             return ResponseEntity.notFound().build();
         }
 

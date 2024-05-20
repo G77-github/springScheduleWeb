@@ -11,8 +11,8 @@
                 <div class="mt-5 ms-5">
                     <span class="font-size-big" th:text="${teamName}"></span>
                     <div>
-                        <span><a><button class="btn btn-secondary">팀 관리</button> </a></span>
-                        <span><a><button class="btn btn-secondary">유저 관리</button> </a></span>
+                        <span><a class="btn btn-secondary" th:href="@{/team/{teamId}/teamManage(teamId=${teamId})}">팀 관리</a></span>
+                        <span><a class="btn btn-secondary" th:href="@{/team/{teamId}/userManage(teamId=${teamId})}">유저 관리</a></span>
                     </div>
                     <form th:action="@{/team/{teamId}/teamManage(teamId = ${team.teamId})}" method="POST">
                         <label for="inputTeamName" class="form-label font-size-middle mt-3">팀 이름</label>

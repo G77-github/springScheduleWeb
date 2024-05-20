@@ -127,6 +127,8 @@ public class EventController {
 
         EventDetailResponse eventDetail = eventService.findEventDetail(eventId, userId);
         model.addAttribute("eventDetail", eventDetail);
+        boolean participateButtonDisable = eventDetail.getEventEnd().isBefore(LocalDateTime.now());
+        model.addAttribute("participateDisable", participateButtonDisable);
 
         Optional<Team> teamByTeamId = teamService.findTeamByTeamId(teamId);
 

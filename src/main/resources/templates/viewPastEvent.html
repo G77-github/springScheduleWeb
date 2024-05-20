@@ -41,7 +41,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr th:each="eventLabel : ${eventLabels}" th:data-team-id="${teamId}" th:data-event-id="${eventLabel.eventId}" onclick="goToImagePage(this)">
+                            <tr th:each="eventLabel : ${eventLabels}" th:data-team-id="${teamId}" th:data-event-id="${eventLabel.eventId}" onclick="goToEventPage(this)">
                                 <td th:text="${eventLabel.eventName}"></td>
                                 <td th:text="${#temporals.format(eventLabel.eventStart, 'yyyy-MM-dd')}"></td>
                             </tr>
@@ -64,10 +64,10 @@
                 window.location.href = url;
             });
 
-            function goToImagePage(element) {
+            function goToEventPage(element) {
                 var teamId = element.getAttribute('data-team-id');
                 var eventId = element.getAttribute('data-event-id');
-                window.location.href='/team/' + teamId +'/imageBoard?eventId=' + eventId;
+                window.location.href='/team/' + teamId +'/event?eventId=' + eventId;
             }
         </script>
         <script th:replace="~{fragments/commonSetting :: boots-js}"></script>

@@ -13,9 +13,9 @@
             <span class="font-size-middle">즐겨찾기</span>
         </li>
 
-        <li th:each="bookMark : ${bookMarks}">
-            <a th:href="@{|/${bookMark.url}|}" class="nav-link text-white">
-                <span th:text="${bookMark.name}"></span>
+        <li th:each="bookMark : ${userBookMarks}">
+            <a th:href="@{/team/{teamId}(teamId=${bookMark.teamId})}" class="nav-link text-white">
+                <span class="bookmark-name" th:text="${bookMark.teamName}"></span>
             </a>
         </li>
     </ul>

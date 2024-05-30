@@ -148,9 +148,11 @@ public class TeamService {
 
     @Transactional
     public void teamExit(Long userId, Long teamId) {
-        teamJoinRepository.deleteByUserIdAndTeamId(userId, teamId);
+        teamJoinRepository.updateUserBlockTrue(userId, teamId);
+
     }
 
+    @Transactional
     public void transferMaster(Long teamId, Long newMasterId) {
         Optional<Team> optionalTeam = teamRepository.findById(teamId);
         Team team = optionalTeam.get();
@@ -178,7 +180,12 @@ public class TeamService {
         for (Image image : imageList) {
 
             Optional<UserProfile> userProfile = userProfileRepository.findById(image.getUserId());
-            String userName = userProfile.get().getUName();
+            String userName;
+            if (userProfile.isEmpty()) {
+                userName = "(알수 없음)";
+            } else {
+                userName = userProfile.get().getUName();
+            }
 
 
             ImageResponse imageResponse = new ImageResponse(image, userName);

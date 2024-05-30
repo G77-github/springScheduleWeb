@@ -15,4 +15,8 @@ public interface TeamRepository extends JpaRepository<Team, Long> {
     @Query("SELECT t FROM Team t WHERE t.isPublic = true AND t.teamName LIKE %:keyword%")
     List<Team> findTeamByKeyword(@Param("keyword") String keyword);
 
+    @Query("SELECT t FROM Team t WHERE t.teamMasterId =:userId")
+    List<Team> findByUserId(@Param("userId") Long userId);
+
+
 }

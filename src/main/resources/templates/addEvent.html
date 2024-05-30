@@ -9,8 +9,9 @@
 
             <main class="full-size">
                 <div class="mt-5 ms-5">
-                    <div class="font-size-big" th:text="${teamName}"></div>
-                    <span class="font-size-big">이벤트 추가</span>
+                    <a class="font-size-big font-fix-black" th:text="${teamName}" th:href="@{/team/{teamId}(teamId = ${teamId})}">
+                    </a>
+                    <div class="font-size-big">이벤트 추가</div>
 
                     <form th:action="@{/team/{teamId}/createEvent(teamId=${teamId})}" method="POST" class="fix-width-long">
                         <div class="mt-3">
@@ -20,13 +21,13 @@
                             <label class="btn" for="radio2">불가일</label>
                         </div>
                         <label for="inputEventName" class="form-label font-size-middle mt-2">이벤트 명</label>
-                        <input type="text" class="form-control" id="inputEventName" name="eventName">
+                        <input type="text" class="form-control" id="inputEventName" name="eventName" required>
                         <label for="inputEventStart" class="form-label font-size-middle mt-2">시작</label>
-                        <input type="datetime-local" class="form-control" id="inputEventStart" name="eventStart">
+                        <input type="datetime-local" class="form-control" id="inputEventStart" name="eventStart" required>
                         <label for="inputEventEnd" class="form-label font-size-middle">종료</label>
-                        <input type="datetime-local" class="form-control" id="inputEventEnd" name="eventEnd">
+                        <input type="datetime-local" class="form-control" id="inputEventEnd" name="eventEnd" required>
                         <label for="inputEventPlace" class="form-label font-size-middle mt-2">장소</label>
-                        <input type="text" class="form-control" id="inputEventPlace" name="eventPlace">
+                        <input type="text" class="form-control" id="inputEventPlace" name="eventPlace" required>
                         <label for="inputEventDescription" class="form-label font-size-middle mt-2">설명</label>
                         <textarea class="form-control" id="inputEventDescription" rows="5" name="eventContent"></textarea>
 

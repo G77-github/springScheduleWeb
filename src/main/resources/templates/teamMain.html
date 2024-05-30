@@ -13,7 +13,7 @@
                         <span class="font-size-big" th:text="${teamName}"></span>
                         <input type="checkbox" class="btn-check" id="bookmarkButton" th:checked="${bookmark == true}">
                         <label class="btn btn-outline-warning ms-3" for="bookmarkButton">즐겨찾기</label>
-                        <a class="ms-2" th:href="@{/team/{teamId}/teamManage(teamId=${teamId})}" ><i class="bi bi-gear fs-1"></i></a>
+                        <a th:if="${isMaster}" class="ms-2" th:href="@{/team/{teamId}/teamManage(teamId=${teamId})}" ><i class="bi bi-gear fs-1"></i></a>
                     </div>
                     <div class="fix-width-long">
                         <div id='calendar'></div>
@@ -33,7 +33,14 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr th:each="futureEventLabel : ${futureEventLabels}" th:data-team-id="${teamId}" th:data-event-id="${futureEventLabel.eventId}" onclick="goToEventPage(this)">
+                            <tr th:if="${#lists.isEmpty(futureEventLabels)}">
+                                <td>등록된 이벤트가 업습니다</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+
+                            <tr class="point" th:each="futureEventLabel : ${futureEventLabels}" th:data-team-id="${teamId}" th:data-event-id="${futureEventLabel.eventId}" onclick="goToEventPage(this)">
                                 <td th:text="${futureEventLabel.eventName}"></td>
                                 <td th:text="${futureEventLabel.eventPlace}"></td>
                                 <td th:text="${#temporals.format(futureEventLabel.eventStart, 'yyyy-MM-dd HH:mm')}"></td>
@@ -43,6 +50,7 @@
                     </table>
                 </div>
 
+                <div th:replace="~{fragments/common :: footer}"></div>
             </main>
 
         </div>
@@ -81,6 +89,7 @@
 
         <script th:replace="~{fragments/commonSetting :: boots-js}"></script>
         <script th:replace="~{fragments/commonSetting :: team-main-cal}"></script>
+        <script th:replace="~{fragments/commonSetting :: team-main-exit}"></script>
     </body>
 
 </html>

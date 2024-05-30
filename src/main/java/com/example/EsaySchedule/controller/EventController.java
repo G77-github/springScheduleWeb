@@ -1,18 +1,17 @@
 package com.example.EsaySchedule.controller;
 
 import com.example.EsaySchedule.dto.*;
-import com.example.EsaySchedule.entity.Event;
-import com.example.EsaySchedule.entity.EventJoin;
-import com.example.EsaySchedule.entity.Team;
-import com.example.EsaySchedule.entity.UserProfile;
+import com.example.EsaySchedule.entity.*;
 import com.example.EsaySchedule.service.EventService;
 import com.example.EsaySchedule.service.TeamService;
 import com.example.EsaySchedule.service.ValidationService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -41,8 +40,11 @@ public class EventController {
             return "error";
         }
 
+        Long userId = currentUser.getUserId();
         String userName = currentUser.getUName();
         model.addAttribute("userName", userName);
+        List<Bookmark> userBookMarks = teamService.findUserBookMarks(userId);
+        model.addAttribute("userBookMarks", userBookMarks);
 
         Optional<Team> teamByTeamId = teamService.findTeamByTeamId(teamId);
         model.addAttribute("teamId", teamByTeamId.get().getTeamId());
@@ -53,7 +55,11 @@ public class EventController {
     }
 
     @PostMapping("/team/{teamId}/createEvent")
-    public String createEvent(@PathVariable("teamId")Long teamId, @ModelAttribute AddEventRequest eventRequest) {
+    public String createEvent(@PathVariable("teamId")Long teamId, @Valid @ModelAttribute AddEventRequest eventRequest, BindingResult bindingResult) {
+
+        if (bindingResult.hasErrors()) {
+            return "error";
+        }
 
         log.info("teamId={}", eventRequest.getTeamId());
         log.info("evnetName={}", eventRequest.getEventName());
@@ -82,10 +88,6 @@ public class EventController {
             return "error";
         }
 
-        if (eventRequest.getEventName() == null || eventRequest.getEventStart() == null || eventRequest.getEventPlace() == null || eventRequest.getEventContent() == null) {
-            log.info("필수값들이 입력되지 않음");
-            return "error";
-        }
         eventRequest.setEventRegistration(LocalDateTime.now());
         Event saveEvent = eventService.save(eventRequest);
 
@@ -124,9 +126,12 @@ public class EventController {
         Long userId = currentUser.getUserId();
         model.addAttribute("userId", userId);
         model.addAttribute("userName", currentUser.getUName());
+        List<Bookmark> userBookMarks = teamService.findUserBookMarks(userId);
+        model.addAttribute("userBookMarks", userBookMarks);
 
-        EventDetailResponse eventDetail = eventService.findEventDetail(eventId, userId);
+        EventDetailResponse eventDetail = eventService.findEventDetail(eventId);
         model.addAttribute("eventDetail", eventDetail);
+
         boolean participateButtonDisable = eventDetail.getEventEnd().isBefore(LocalDateTime.now());
         model.addAttribute("participateDisable", participateButtonDisable);
 
@@ -142,7 +147,13 @@ public class EventController {
         Boolean userParticipateCheck = eventService.userParticipateCheck(eventId, userId);
         model.addAttribute("userParticipate", userParticipateCheck);
 
+        Boolean isWriter = false;
+        Long writer = eventDetail.getUserId();
 
+        if (userId.equals(writer)) {
+            isWriter = true;
+        }
+        model.addAttribute("isWriter", isWriter);
 
         return "viewEvent";
     }
@@ -181,25 +192,31 @@ public class EventController {
         }
 
         Long userId = currentUser.getUserId();
-        EventDetailResponse eventDetail = eventService.findEventDetail(eventId);
+        List<Bookmark> userBookMarks = teamService.findUserBookMarks(userId);
+        model.addAttribute("userBookMarks", userBookMarks);
 
-        log.info("오류위치 확인1");
-        log.info("userId={}", userId.getClass().getName());
-        log.info("EuserId={}", eventDetail.getUserId().getClass().getName());
+        EventDetailResponse eventDetail = eventService.findEventDetail(eventId);
 
         if (!userId.equals(eventDetail.getUserId())) {
             return "error";
         }
 
+        Optional<Team> teamByTeamId = teamService.findTeamByTeamId(teamId);
+
         model.addAttribute("eventDetail", eventDetail);
         model.addAttribute("teamId", teamId);
+        model.addAttribute("teamName", teamByTeamId.get().getTeamName());
 
         return "editEvent";
 
     }
 
     @PostMapping("/team/{teamId}/eventEdit")
-    public String editEvent(@PathVariable(name = "teamId") Long teamId, @RequestParam(name = "eventId") Long eventId, @ModelAttribute EditEventRequest eventRequest) {
+    public String editEvent(@PathVariable(name = "teamId") Long teamId, @RequestParam(name = "eventId") Long eventId, @Valid @ModelAttribute EditEventRequest eventRequest, BindingResult bindingResult) {
+
+        if (bindingResult.hasErrors()) {
+            return "error";
+        }
 
         UserProfile currentUser = validationService.getUserData();
 
@@ -292,7 +309,10 @@ public class EventController {
         Long userId = currentUser.getUserId();
         List<Long> joinList = eventService.findEventJoinByUserId(userId);
         List<Event> joinEventList = eventService.findEventsByUserId(joinList);
-        List<FullCalDto> eventData = joinEventList.stream().map(FullCalDto::new).toList();
+        List<FullCalDto> eventData = joinEventList.stream()
+                .filter(event -> !event.getNotEvent())
+                .map(event -> new FullCalDto(event, "rgb(33,37,41)"))
+                .toList();
 
         return eventData;
 
@@ -320,7 +340,19 @@ public class EventController {
 
         List<FullCalDto> teamEventList = Stream.concat(list1.stream(), list2.stream()).collect(Collectors.toList());
         return teamEventList;
+    }
 
+    @GetMapping("/event/team/{teamId}/xday")
+    @ResponseBody
+    public List<FullCalDto> findTeamXday(@PathVariable("teamId") Long teamId) {
+        UserProfile currentUser = validationService.getUserData();
 
+        if (currentUser == null) {
+            return Collections.emptyList();
+        }
+
+        List<Event> xdays = eventService.findXdayByTeamId(teamId);
+        List<FullCalDto> teamXDayList = xdays.stream().map(event -> new FullCalDto(event, "rgb(239,86,86)")).toList();
+        return teamXDayList;
     }
 }

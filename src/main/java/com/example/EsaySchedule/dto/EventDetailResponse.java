@@ -27,7 +27,9 @@ public class EventDetailResponse {
         this.eventContent = event.getEventContent();
         this.eventStart = event.getEventStart();
         this.eventEnd = event.getEventEnd();
+        this.userId = userProfile.getUserId();
         this.userName = userProfile.getUName();
+        this.notEvent = event.getNotEvent();
     }
 
     public EventDetailResponse(Event event) {

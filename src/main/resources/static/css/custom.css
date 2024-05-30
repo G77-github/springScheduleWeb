@@ -69,3 +69,110 @@ main {
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
+.btn-nowrap {
+    white-space: nowrap;
+}
+
+.fix-card-img-size{
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.image-container {
+    position: relative;
+    display: inline-block;
+}
+
+.image-container .delete-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: none;
+}
+
+.image-container:hover .delete-button {
+    display: block;
+}
+
+.image-popup {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    padding-top: 100px;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0,0,0);
+    background-color: rgba(0,0,0,0.9);
+}
+
+.popup-content {
+    margin: auto;
+    display: block;
+    width: 80%;
+    max-width: 700px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.close {
+    position: absolute;
+    top: 15px;
+    right: 35px;
+    color: #f1f1f1;
+    font-size: 40px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.prev, .next {
+    cursor: pointer;
+    position: absolute;
+    top: 50%;
+    width: auto;
+    padding: 16px;
+    margin-top: -50px;
+    color: white;
+    font-weight: bold;
+    font-size: 20px;
+    transition: 0.6s ease;
+    border-radius: 0 3px 3px 0;
+    user-select: none;
+    text-decoration: none;
+}
+
+.next {
+    right: 0;
+    border-radius: 3px 0 0 3px;
+}
+
+.prev {
+    left: 0;
+    border-radius: 3px 0 0 3px;
+}
+
+.card-back-ground-color {
+    background: linear-gradient(135deg, #6e8efb, #a777e3);
+}
+
+.fix-label-width {
+    width: 150px;
+    display: inline-block;
+}
+
+.footer {
+    height: 300px;
+    width: 100%;
+
+}
+
+tr.point:hover td {
+    cursor: pointer;
+    background-color: #f2f2f2;
+}

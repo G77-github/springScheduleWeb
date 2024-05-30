@@ -8,6 +8,7 @@ import com.example.EsaySchedule.entity.UserProfile;
 import com.example.EsaySchedule.service.EventService;
 import com.example.EsaySchedule.service.TeamService;
 import com.example.EsaySchedule.service.ValidationService;
+import jakarta.validation.Valid;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,6 +18,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -40,6 +42,11 @@ public class TeamController {
     @Value("${file.dir}")
     private String fileDir;
 
+
+    @GetMapping("/")
+    public String redirectMain(){
+        return "redirect:/main";
+    }
     @GetMapping("/main") //5/6
     public String viewMain(Model model) {
 
@@ -55,6 +62,10 @@ public class TeamController {
         model.addAttribute("userId", userId);
         model.addAttribute("userName", userName);
 
+        List<Bookmark> userBookMarks = teamService.findUserBookMarks(userId);
+        model.addAttribute("userBookMarks", userBookMarks);
+
+
         //참가 선택한 이벤트
         List<EventAndTeamLabelResponse> userJoinTeamEvent = eventService.findEventsAndTeamsByUserId(userId);
         model.addAttribute("userJoinEvents", userJoinTeamEvent);
@@ -67,8 +78,6 @@ public class TeamController {
         List<TeamResponse> joinTeams = teamService.findUserTeams(userId);
         model.addAttribute("joinTeams", joinTeams);
 
-        List<Bookmark> userBookMarks = teamService.findUserBookMarks(userId);
-        model.addAttribute("userBookMarks", userBookMarks);
 
         //전체 팀 출력(일반인 쓸일 없고 웹 관리자만 쓸것 삭제하기 애매해서 둠)(기억)
 /*        List<TeamResponse> teams = teamService.findAllTeam().stream()
@@ -94,6 +103,14 @@ public class TeamController {
         model.addAttribute("userId", userId);
         model.addAttribute("userName", userName);
 
+        List<Bookmark> userBookMarks = teamService.findUserBookMarks(userId);
+        model.addAttribute("userBookMarks", userBookMarks);
+
+        boolean userTeamJoinCheck = validationService.userTeamJoinCheck(userId, teamId);
+        if (userTeamJoinCheck) {
+            return "redirect:/main";
+        }
+
         Optional<Team> teamByTeamId = teamService.findTeamByTeamId(teamId);
         model.addAttribute("teamId", teamId);
         model.addAttribute("teamName", teamByTeamId.get().getTeamName());
@@ -111,7 +128,13 @@ public class TeamController {
             bookmark = true;
         }
 
+        if (userId.equals(teamByTeamId.get().getTeamMasterId())) {
+            model.addAttribute("isMaster", true);
+        }
+
         model.addAttribute("bookmark", bookmark);
+        model.addAttribute("showLeaveTeamLink", true);
+
 
         return "teamMain";
     }
@@ -130,6 +153,8 @@ public class TeamController {
         model.addAttribute("userId", userId);
         model.addAttribute("userName", userName);
         model.addAttribute("teamId", teamId);
+        List<Bookmark> userBookMarks = teamService.findUserBookMarks(userId);
+        model.addAttribute("userBookMarks", userBookMarks);
 
         Long masterId = teamService.findTeamMasterId(teamId);
 
@@ -143,12 +168,17 @@ public class TeamController {
         Team team = optionalTeam.get();
 
         model.addAttribute("team", team);
+        log.info(" {} ",team.getTeamName());
 
         return "manageTeamTeam";
     }
 
     @PostMapping("/team/{teamId}/teamManage") //5/6
-    public String teamManage(@PathVariable(name = "teamId") Long teamId, @ModelAttribute TeamManageRequest teamManageRequest) {
+    public String teamManage(@PathVariable(name = "teamId") Long teamId, @Valid @ModelAttribute TeamManageRequest teamManageRequest, BindingResult bindingResult) {
+
+        if (bindingResult.hasErrors()) {
+            return "error";
+        }
 
         UserProfile currentUser = validationService.getUserData();
 
@@ -158,6 +188,7 @@ public class TeamController {
 
         Long userId = currentUser.getUserId();
         Long masterId = teamService.findTeamMasterId(teamId);
+
 
         if (!userId.equals(masterId)) {
             return "redirect:/team/" + teamId;
@@ -181,6 +212,8 @@ public class TeamController {
         String userName = currentUser.getUName();
         model.addAttribute("userId", userId);
         model.addAttribute("userName", userName);
+        List<Bookmark> userBookMarks = teamService.findUserBookMarks(userId);
+        model.addAttribute("userBookMarks", userBookMarks);
 
         Long masterId = teamService.findTeamMasterId(teamId);
 
@@ -197,6 +230,8 @@ public class TeamController {
         model.addAttribute("waitingUsers", waitingToJoinUsers);
 
         model.addAttribute("teamId", teamId);
+        Optional<Team> teamByTeamId = teamService.findTeamByTeamId(teamId);
+        model.addAttribute("teamName", teamByTeamId.get().getTeamName());
 
         List<UserLabelResponse> teamUsers = teamService.findTeamUsers(teamId);
         model.addAttribute("teamUsers", teamUsers);
@@ -219,8 +254,16 @@ public class TeamController {
         Long userId = currentUser.getUserId();
         String userName = currentUser.getUName();
 
+
+
         model.addAttribute("userId", userId);
         model.addAttribute("userName", userName);
+        List<Bookmark> userBookMarks = teamService.findUserBookMarks(userId);
+        model.addAttribute("userBookMarks", userBookMarks);
+
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return "search";
+        }
 
         List<TeamResponse> teams = teamService.findTeamByKeyword(keyword);
 
@@ -244,22 +287,25 @@ public class TeamController {
 
         model.addAttribute("userId", userId);
         model.addAttribute("userName", userName);
+        List<Bookmark> userBookMarks = teamService.findUserBookMarks(userId);
+        model.addAttribute("userBookMarks", userBookMarks);
 
         return "createTeam";
     }
 
     @PostMapping("/createTeam") //5/6
-    public String createTeam(@ModelAttribute AddTeamRequest addTeamRequest) {
+    public String createTeam(@Valid @ModelAttribute AddTeamRequest addTeamRequest, BindingResult result) {
+
+        if (result.hasErrors()) {
+            return "error";
+        }
+
         UserProfile currentUser = validationService.getUserData();
         if (currentUser == null) {
             return "error";
         }
         Long userId = currentUser.getUserId();
         addTeamRequest.setTeamMasterId(userId);
-
-        if (addTeamRequest.getTeamName() == null) {
-            return "redirect:/main";
-        }
 
         Team newTeam = teamService.save(addTeamRequest);
 
@@ -269,13 +315,19 @@ public class TeamController {
         return "redirect:/main";
     }
 
-    @PostMapping("/team/join") //5/6
+    @GetMapping("/team/join") //5/6
     @ResponseBody
     public ResponseEntity<?> joinTeam(@RequestParam("teamId") Long teamId) {
 
         UserProfile currentUser = validationService.getUserData();
 
         Long userId = currentUser.getUserId();
+
+        boolean preSubscriptionCheck = validationService.preSubscriptionCheck(userId, teamId);
+
+        if (preSubscriptionCheck) {
+            return ResponseEntity.badRequest().build();
+        }
 
         //지금은 그냥 넘어가는데 teamId로 team테이블 조회해서 자동 가입승인 값 확인하고 확이하면
         //joinTeamAuto써야함 참고로 Db테이블도 값 수정해야함 지금은 그냥 넘어가게 만들어둠
@@ -356,7 +408,20 @@ public class TeamController {
 
     @GetMapping("/team/{teamId}/exit")
     public String exitTeam(@PathVariable("teamId") Long teamId) {
-        Long userId = 3L; //나중에 세션에서 가져와야함
+
+        UserProfile currentUser = validationService.getUserData();
+
+        if (currentUser == null) {
+            return "error";
+        }
+
+        Long userId = currentUser.getUserId();
+
+        Long teamMasterId = teamService.findTeamMasterId(teamId);
+
+        if (userId.equals(teamMasterId)) {
+            return "error";
+        }
 
         teamService.teamExit(userId, teamId);
 
@@ -364,11 +429,22 @@ public class TeamController {
     }
 
     @GetMapping("/team/{teamId}/userManage/masterTransfer")
-    public String masterTransfer(@PathVariable("teamId") Long teamId, @RequestParam("newMasterId") Long newMasterId) {
+    public ResponseEntity<?> masterTransfer(@PathVariable("teamId") Long teamId, @RequestParam("newMasterId") Long newMasterId) {
 
-        teamService.transferMaster(teamId, newMasterId);
+        UserProfile currentUser = validationService.getUserData();
+        Long userId = currentUser.getUserId();
+        Long teamMasterId = teamService.findTeamMasterId(teamId);
+        if (!userId.equals(teamMasterId)) {
+            return ResponseEntity.badRequest().build();
+        }
 
-        return "redirect:/team/" + teamId;
+        try {
+            teamService.transferMaster(teamId, newMasterId);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+
     }
 
     @GetMapping("/team/{teamId}/pastEvent")
@@ -383,12 +459,18 @@ public class TeamController {
             return "error";
         }
 
+        Long userId = currentUser.getUserId();
         String userName = currentUser.getUName();
+
+        model.addAttribute("userId", userId);
         model.addAttribute("userName", userName);
+        List<Bookmark> userBookMarks = teamService.findUserBookMarks(userId);
+        model.addAttribute("userBookMarks", userBookMarks);
 
         Optional<Team> teamByTeamId = teamService.findTeamByTeamId(teamId);
         model.addAttribute("teamName", teamByTeamId.get().getTeamName());
         model.addAttribute("teamId", teamId);
+
 
         if (year == null && month == null) {
             return "viewPastEvent";
@@ -419,6 +501,8 @@ public class TeamController {
         Long userId = currentUser.getUserId();
         String userName = currentUser.getUName();
         model.addAttribute("userName", userName);
+        List<Bookmark> userBookMarks = teamService.findUserBookMarks(userId);
+        model.addAttribute("userBookMarks", userBookMarks);
 
         Optional<Team> teamByTeamId = teamService.findTeamByTeamId(teamId);
         model.addAttribute("teamName", teamByTeamId.get().getTeamName());
@@ -486,10 +570,6 @@ public class TeamController {
     @ResponseBody
     public ResponseEntity<?> addBookmark(@RequestParam("teamId") Long teamId, @RequestParam("teamName") String teamName) {
 
-
-        log.info("teamId = {} teamName ={} ", teamId, teamName);
-        log.info("북마크 추가 코드시작");
-
         UserProfile currentUser = validationService.getUserData();
 
         if (currentUser == null) {
@@ -499,7 +579,6 @@ public class TeamController {
         Long userId = currentUser.getUserId();
 
         teamService.addBookmark(userId, teamId, teamName);
-        log.info("북마크 추가 코드종료");
 
         return ResponseEntity.ok().build();
     }
@@ -508,9 +587,6 @@ public class TeamController {
     @ResponseBody
     public ResponseEntity<?> deleteBookmark(@RequestParam("teamId")Long teamId) {
 
-
-
-        log.info("북마크 삭제 코드 실행중");
         UserProfile currentUser = validationService.getUserData();
 
         if (currentUser == null) {
@@ -520,8 +596,6 @@ public class TeamController {
         Long userId = currentUser.getUserId();
 
         teamService.deleteBookmark(userId, teamId);
-        log.info("북마크 삭제 코드 실행종료");
-
 
         return ResponseEntity.ok().build();
     }

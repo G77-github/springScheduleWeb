@@ -49,6 +49,27 @@ public class UserProfile implements UserDetails {
         this.userBan = userBan;
     }
 
+    public UserProfile(UserProfile userProfile, String newUName) {
+        this.userId = userProfile.getUserId();
+        this.uName = newUName;
+        this.userPassword = userProfile.getUserPassword();
+        this.userEmail = userProfile.getUserEmail();
+        this.isVerified = userProfile.getIsVerified();
+        this.userBan = userProfile.userBan;
+    }
+
+    public static UserProfile emptyUser() {
+        return UserProfile.builder().userName("(알수 없음)").build();
+    }
+
+    public void setUName(String uName) {
+        this.uName = uName;
+    }
+
+    public void setUserPassword(String userPassword) {
+        this.userPassword = userPassword;
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("user"));

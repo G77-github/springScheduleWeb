@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/commonSetting :: head}">
+</head>
+
+<body>
+<div class="d-flex full-size">
+    <aside th:replace="~{fragments/common :: aside}"></aside>
+
+    <main class="full-size">
+        <div class="ms-5 mt-5 fix-width-long">
+            <div class="font-size-big">회원정보 수정</div>
+            <div class="mt-5">
+                <span class="font-size-middle">이메일 : </span>
+                <span class="font-size-middle" th:text="${userEmail}"></span>
+            </div>
+            <hr>
+            <form method="POST" action="/userDetail">
+                <div class="row g-3 align-items-center font-size-middle">
+                    <div class="col-auto">
+                        <label for="inputUserName" class="col-form-label">이름 : </label>
+                    </div>
+                    <div class="col-auto">
+                        <input  type="text" id="inputUserName" name="userName" class="form-control" th:value="${userName}">
+                    </div>
+                    <div class="col-auto">
+                        <button type="submit" class="btn btn-dark">
+                            <i class="bi bi-pencil-square font-size-middle"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
+            <hr>
+            <button class="btn btn-dark font-size-middle" onclick="window.open('/verifyPassword', '창이름', 'width=600,height=250,location=no,status=no,scrollbars=yes');">
+                비밀번호 변경</button>
+            <hr>
+            <button id="unregisterButton" class="btn btn-danger font-size-middle">회원 탈퇴</button>
+        </div>
+    </main>
+
+</div>
+
+<script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        var unregisterButton = document.getElementById('unregisterButton');
+
+        unregisterButton.addEventListener('click', function() {
+            var result = confirm("정말 탈퇴하시겠습니까?");
+            if(result) {
+                window.location.href="/preUnregister";
+            }
+        });
+    });
+</script>
+
+<script th:replace="~{fragments/commonSetting :: boots-js}"></script>
+</body>
+
+</html>

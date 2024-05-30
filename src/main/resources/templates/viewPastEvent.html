@@ -41,7 +41,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr th:each="eventLabel : ${eventLabels}" th:data-team-id="${teamId}" th:data-event-id="${eventLabel.eventId}" onclick="goToEventPage(this)">
+                            <tr class="point" th:each="eventLabel : ${eventLabels}" th:data-team-id="${teamId}" th:data-event-id="${eventLabel.eventId}" onclick="goToEventPage(this)">
                                 <td th:text="${eventLabel.eventName}"></td>
                                 <td th:text="${#temporals.format(eventLabel.eventStart, 'yyyy-MM-dd')}"></td>
                             </tr>

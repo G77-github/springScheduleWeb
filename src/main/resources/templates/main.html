@@ -23,7 +23,13 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr th:each="joinEvent : ${userJoinEvents}" th:data-team-id="${joinEvent.teamId}" th:data-event-id="${joinEvent.eventId}" onclick="goToEventPage(this)">
+                            <tr th:if="${#lists.isEmpty(userJoinEvents)}">
+                                <td>참여할 이벤트가 없습니다</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr class="point"  th:each="joinEvent : ${userJoinEvents}" th:data-team-id="${joinEvent.teamId}" th:data-event-id="${joinEvent.eventId}" onclick="goToEventPage(this)">
                                 <td th:text="${joinEvent.teamName}"></td>
                                 <td th:text="${joinEvent.eventName}"></td>
                                 <td th:text="${#temporals.format(joinEvent.eventStart, 'yyyy-MM-dd HH:mm')}"></td>
@@ -44,7 +50,13 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr th:each="newEvent : ${newEvents}" th:data-team-id="${newEvent.teamId}" th:data-event-id="${newEvent.eventId}" onclick="goToEventPage(this)">
+                        <tr th:if="${#lists.isEmpty(newEvents)}">
+                            <td>새로 등록된 이벤트가 없습니다</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                            <tr class="point" th:each="newEvent : ${newEvents}" th:data-team-id="${newEvent.teamId}" th:data-event-id="${newEvent.eventId}" onclick="goToEventPage(this)">
                                 <td th:text="${newEvent.teamName}"></td>
                                 <td th:text="${newEvent.eventName}"></td>
                                 <td th:text="${#temporals.format(newEvent.eventStart, 'yyyy-MM-dd HH:mm')}"></td>
@@ -64,13 +76,19 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr th:each="team : ${joinTeams}" th:data-team-id="${team.teamId}" onclick="goToTeamPage(this)">
+                        <tr th:if="${#lists.isEmpty(joinTeams)}">
+                            <td>가입한 팀이 없습니다</td>
+                            <td></td>
+                        </tr>
+                            <tr class="point"  th:each="team : ${joinTeams}" th:data-team-id="${team.teamId}" onclick="goToTeamPage(this)">
                                 <td th:text="${team.teamName}"></td>
                                 <td th:text="${team.teamDescription}"></td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
+
+                <div th:replace="~{fragments/common :: footer}"></div>
             </main>
 
         </div>

@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
@@ -19,30 +20,43 @@ public class WebSecurityConfig {
     private final UserDetailService userService;
     private final CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
 
-    @Bean
-    public WebSecurityCustomizer configure() {
-        return (web -> web.ignoring()
-                .requestMatchers("/static/**"));
-    }
+//    @Bean
+//    public WebSecurityCustomizer configure() {
+//        return (web) -> web.ignoring()
+//                .requestMatchers("/static/**");
+//    }
+//
+//    @Bean
+//    public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
+//        return httpSecurity
+//                .authorizeRequests()
+//                .requestMatchers("/login", "/signup", "/user").permitAll()
+//                .anyRequest().authenticated()
+//                .and()
+//                .formLogin()
+//                .loginPage("/login")
+//                .successHandler(customAuthenticationSuccessHandler)
+//                .defaultSuccessUrl("/main")
+//                .and()
+//                .logout()
+//                .logoutSuccessUrl("/login")
+//                .invalidateHttpSession(true)
+//                .and()
+//                .csrf().disable()
+//                .build();
+//    }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
-        return httpSecurity
-                .authorizeRequests()
-                .requestMatchers("/login", "/signup", "/user").permitAll()
-                .anyRequest().authenticated()
-                .and()
-                .formLogin()
-                .loginPage("/login")
-                .successHandler(customAuthenticationSuccessHandler)
-                .defaultSuccessUrl("/main")
-                .and()
-                .logout()
-                .logoutSuccessUrl("/login")
-                .invalidateHttpSession(true)
-                .and()
-                .csrf().disable()
-                .build();
+    SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
+        http.authorizeHttpRequests((request) ->
+                        request.requestMatchers("/login", "/signup", "/checkUserEmail", "/css/**").permitAll()
+                                .anyRequest().authenticated())
+                .formLogin( (formLogin) ->
+                        formLogin.loginPage("/login")
+                                .defaultSuccessUrl("/main"))
+                .csrf( (csrf) -> csrf.disable());
+
+        return http.build();
     }
 
 

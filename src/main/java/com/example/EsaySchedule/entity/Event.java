@@ -73,5 +73,6 @@ public class Event {
         this.eventStart = eventRequest.getEventStart();
         this.eventEnd = eventRequest.getEventEnd();
         this.eventRegistration = eventRequest.getEventRegistration();
+        this.notEvent = eventRequest.getNotEvent();
     }
 }

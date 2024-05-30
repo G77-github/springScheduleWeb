@@ -9,7 +9,8 @@
 
             <main class="full-size">
                 <div class="mt-5 ms-5">
-                    <span class="font-size-big" th:text="${teamName}"></span>
+                    <a class="font-size-big font-fix-black" th:text="${teamName}" th:href="@{/team/{teamId}(teamId = ${teamId})}">
+                    </a>
                     <div>
                         <span><a class="btn btn-secondary" th:href="@{/team/{teamId}/teamManage(teamId=${teamId})}">팀 관리</a></span>
                         <span><a class="btn btn-secondary" th:href="@{/team/{teamId}/userManage(teamId=${teamId})}">유저 관리</a></span>
@@ -25,6 +26,12 @@
                             </tr>
                         </thead>
                         <tbody>
+                            <tr th:if="${#lists.isEmpty(waitingUsers)}">
+                                <td>가입 신청이 없습니다</td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+
                             <tr th:each="waitingUser : ${waitingUsers}">
                                 <td th:text="${waitingUser.userName}"></td>
                                 <td th:text="${waitingUser.userEmail}"></td>
@@ -39,6 +46,7 @@
                                 <th>Name</th>
                                 <th>Email</th>
                                 <th></th>
+                                <th></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -46,6 +54,7 @@
                                 <td th:text="${teamUser.userName}"></td>
                                 <td th:text="${teamUser.userEmail}"></td>
                                 <td><button class="btn btn-close btn-sm block-button" th:data-join-user-id="${teamUser.userId}"></button> </td>
+                                <td><button class="btn btn-primary btn-sm master-transfer-button" th:data-team-user-id="${teamUser.userId}">마스터 이전</button> </td>
                             </tr>
                         </tbody>
                     </table>
@@ -59,9 +68,15 @@
                             </tr>
                         </thead>
                         <tbody>
+                            <tr th:if="${#lists.isEmpty(blockUsers)}">
+                                <td>차단 회원이 없습니다</td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+
                             <tr th:each="blockUser : ${blockUsers}">
-                                <td th:text="${blockUser.userName"></td>
-                                <td th:text="${blockUser.userEmail"></td>
+                                <td th:text="${blockUser.userName}"></td>
+                                <td th:text="${blockUser.userEmail}"></td>
                                 <td><button class="btn btn-close btn-sm unblock-button" th:data-block-user-id="${blockUser.userId}"></button> </td>
 
                             </tr>
@@ -126,11 +141,30 @@
                 });
             });
 
+            $(document).ready( ()=> {
+                $('.master-transfer-button').click( function() {
+                    var userId = $(this).data('team-user-id');
+                    var teamId = [[${teamId}]];
+                    $.ajax({
+                        type: "GET",
+                        url: `/team/${teamId}/userManage/masterTransfer?newMasterId=${userId}`,
+                        success: ()=>{
+                            alert("마스터 이전 성공");
+                            window.location.href = "/team/" + teamId;
+                        },
+                        error: (xhr, status, error) => {
+                            alert("마스터 이전 실패");
+                        }
+                    });
+                });
+            });
+
 
 
         </script>
 
         <script th:replace="~{fragments/commonSetting :: boots-js}"></script>
+
     </body>
 
 </html>

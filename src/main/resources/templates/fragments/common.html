@@ -25,11 +25,17 @@
             <strong th:text="${userName}"></strong>
         </a>
         <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
-            <li><a class="dropdown-item" href="createTeam">그룹 생성</a> </li>
+            <li><a class="dropdown-item" href="/createTeam">팀 생성</a> </li>
             <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="#">사용자 설정</a></li>
+            <li th:if="${showLeaveTeamLink != null and showLeaveTeamLink}"><a class="dropdown-item" href="#" onclick="confirmExitTeam()">팀 탈퇴</a> </li>
+            <li th:if="${showLeaveTeamLink != null and showLeaveTeamLink}"><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="/userDetail">사용자 설정</a></li>
             <li><hr class="dropdown-divider"></li>
             <li><a class="dropdown-item" href="/logout">로그아웃</a></li>
         </ul>
     </div>
+</div>
+
+<div th:fragment="footer" class="footer">
+
 </div>

@@ -38,3 +38,4 @@ out/
 ### VS Code ###
 .vscode/
 /src/main/resources/templates/layout.html
+/src/main/resources/application.properties

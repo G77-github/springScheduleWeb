@@ -12,10 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -47,6 +45,11 @@ public class EventService {
     public List<Event> findEventByTeamId(Long teamId) {
         return eventRepository.findByTeamIdAndNotEventFalse(teamId);
     }
+
+    public List<Event> findXdayByTeamId(Long teamId) {
+        return eventRepository.findByTeamIdAndNotEventTrue(teamId);
+    }
+
 
     public List<Event> findFutureEventByTeamId(Long teamId, LocalDateTime now) {
         return eventRepository.findFutureEventByTeamIdAndNotEventFalse(teamId, now);
@@ -84,7 +87,10 @@ public class EventService {
                 }
             }
 
-        return result;
+        //날짜 기준으로 오름차순 정렬되게 수정
+        return result.stream()
+                .sorted(Comparator.comparing(EventAndTeamLabelResponse::getEventStart))
+                .collect(Collectors.toList());
 
     }
 
@@ -115,21 +121,27 @@ public class EventService {
     }
 
 
-    public EventDetailResponse findEventDetail(Long eventId, Long userId) {
+    public EventDetailResponse findEventDetail(Long eventId) {
         Optional<Event> optionalEvent = eventRepository.findById(eventId);
         Event event = optionalEvent.get();
+        Long userId = event.getUserId();
         Optional<UserProfile> optionalUserProfile = userProfileRepository.findById(userId);
-        UserProfile user = optionalUserProfile.get();
+        UserProfile user;
+        if (optionalUserProfile.isEmpty()) {
+            user = UserProfile.emptyUser();
+        } else {
+            user = optionalUserProfile.get();
+        }
 
         return new EventDetailResponse(event, user);
     }
 
-    public EventDetailResponse findEventDetail(Long eventId) {
-        Optional<Event> optionalEvent = eventRepository.findById(eventId);
-        Event event = optionalEvent.get();
-
-        return new EventDetailResponse(event);
-    }
+//    public EventDetailResponse findEventDetail(Long eventId) {
+//        Optional<Event> optionalEvent = eventRepository.findById(eventId);
+//        Event event = optionalEvent.get();
+//
+//        return new EventDetailResponse(event);
+//    }
 
     public List<EventParticipantsResponse> findEventParticipants(Long eventId) {
 

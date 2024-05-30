@@ -3,6 +3,7 @@ package com.example.EsaySchedule.repository;
 import com.example.EsaySchedule.entity.TeamJoin;
 import com.example.EsaySchedule.entity.TeamJoinPK;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -28,5 +29,14 @@ public interface TeamJoinRepository extends JpaRepository<TeamJoin, TeamJoinPK> 
 
     @Query("DELETE FROM TeamJoin tj WHERE tj.userId = :userId AND tj.teamId = :teamId")
     void deleteByUserIdAndTeamId(@Param("userId") Long userId, @Param("teamId") Long teamId);
+
+    @Query("UPDATE TeamJoin tj SET tj.userBlock = TRUE WHERE tj.userId = :userId AND tj.teamId =:teamId")
+    @Modifying
+    void updateUserBlockTrue(@Param("userId") Long userId, @Param("teamId") Long teamId);
+
+    @Query("DELETE FROM TeamJoin tj WHERE tj.userId =:userId")
+    @Modifying
+    void deleteByUserId(@Param("userId") Long userId);
+
 
 }

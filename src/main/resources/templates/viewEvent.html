@@ -18,25 +18,30 @@
                                 <span class="font-size-big" th:text="${eventDetail.eventName}"></span>
                                 <a class="btn btn-dark ms-1" th:href="@{/team/{teamId}/imageBoard(teamId=${teamId}, eventId=${eventDetail.eventId})}">사진 게시판</a>
                             </div>
-                            <div>
+                            <div th:if="${isWriter}">
                                 <a class="btn btn-secondary" th:href="@{/team/{teamId}/eventEdit(teamId = ${teamId}, eventId=${eventDetail.eventId})}">수정</a>
                                 <button class="btn btn-secondary" th:attr="data-team-id=${teamId}, data-event-id=${eventDetail.eventId}" onclick="deleteEvent(this)">삭제</button>
                             </div>
                         </div>
                         <hr>
                         <div class="mt-3">
-                            <span class="font-size-middle">등록 유저</span>
+                            <span class="font-size-middle">등록 유저: </span>
                             <span class="font-size-middle" th:text="${eventDetail.userName}"></span>
                         </div>
                         <hr>
                         <div class="mt-2">
+                            <span class="font-size-middle">날짜 및 시간: </span>
                             <span class="font-size-middle" th:text="${#temporals.format(eventDetail.eventStart, 'yyyy-MM-dd HH:mm')}"></span>
                             <span class="font-size-middle"> ~ </span>
                             <span class="font-size-middle" th:text="${#temporals.format(eventDetail.eventEnd, 'MM-dd HH:mm')}"></span>
                         </div>
                         <hr>
-                        <div class="font-size-middle mt-2" th:text="${eventDetail.eventPlace}"></div>
+                        <div class="mt-2" >
+                            <span class="font-size-middle">장소: </span>
+                            <span class="font-size-middle" th:text="${eventDetail.eventPlace}"></span>
+                        </div>
                         <hr>
+                        <div class="mt-2 font-size-middle">설명</div>
                         <div class="font-size-middle mt-2" th:text="${eventDetail.eventContent}"></div>
                     </div>
                     <div class="fix-width-short ms-5">

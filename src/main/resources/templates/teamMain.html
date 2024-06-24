@@ -34,7 +34,7 @@
                         </thead>
                         <tbody>
                             <tr th:if="${#lists.isEmpty(futureEventLabels)}">
-                                <td>등록된 이벤트가 업습니다</td>
+                                <td>등록된 이벤트가 없습니다</td>
                                 <td></td>
                                 <td></td>
                                 <td></td>
@@ -77,7 +77,7 @@
                         },
                         contentType: "application/x-www-form-urlencoded",
                         success: ()=>{
-                            alert('북마크 상태 변경 성공 이 알림창 나중에 삭제');
+<!--                            alert('북마크 설정 완료');-->
                         },
                         error: (xhr, status, error) =>{
                             alert('북마크 상태 변경 실패');

@@ -19,7 +19,7 @@ public class EventLabelResponse {
 
     public EventLabelResponse(Event event) {
         this.eventId = event.getEventId();
-        this.eventName = event.getEventPlace();
+        this.eventName = event.getEventName();
         this.eventPlace = event.getEventPlace();
         this.eventStart = event.getEventStart();
         this.eventEnd = event.getEventEnd();

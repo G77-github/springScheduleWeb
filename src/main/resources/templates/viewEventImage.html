@@ -9,8 +9,9 @@
 
             <main class="full-size">
                 <div class="mt-5 ms-5 fix-width-long">
-                    <div class="font-size-big" th:text="${teamName}"></div>
-                    <div class="d-flex flex-row">
+                    <a class="font-size-big font-fix-black" th:text="${teamName}" th:href="@{/team/{teamId}(teamId = ${teamId})}"></a>
+
+                    <div class="d-flex flex-row mt-2">
                         <span class="font-size-big" th:text="${eventName}"></span>
                         <button class="btn btn-secondary ms-3" id="addImageButton">이미지 추가</button>
                         <input type="file" id="imageInput" multiple style="display:none;" onchange="uploadImages()">
@@ -89,6 +90,7 @@
                         url: "/deleteImage/" + imageId,
                         success: ()=>{
                             alert("삭제성공");
+                            location.reload();
                         },
                         error: (xhr, status, error) =>{
                             alert("삭제 실패");

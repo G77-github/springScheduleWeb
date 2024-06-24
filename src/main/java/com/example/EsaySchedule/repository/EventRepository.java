@@ -38,4 +38,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     List<Event> findByTeamIdAndNotEventFalse(Long teamId);
 
     List<Event> findByTeamIdAndNotEventTrue(Long teamId);
+
+    @Modifying
+    void deleteByTeamId(Long teamId);
 }

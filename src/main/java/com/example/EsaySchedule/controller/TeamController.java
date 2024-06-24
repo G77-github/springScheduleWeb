@@ -44,9 +44,10 @@ public class TeamController {
 
 
     @GetMapping("/")
-    public String redirectMain(){
+    public String redirectMain() {
         return "redirect:/main";
     }
+
     @GetMapping("/main") //5/6
     public String viewMain(Model model) {
 
@@ -168,7 +169,7 @@ public class TeamController {
         Team team = optionalTeam.get();
 
         model.addAttribute("team", team);
-        log.info(" {} ",team.getTeamName());
+        log.info(" {} ", team.getTeamName());
 
         return "manageTeamTeam";
     }
@@ -253,7 +254,6 @@ public class TeamController {
 
         Long userId = currentUser.getUserId();
         String userName = currentUser.getUName();
-
 
 
         model.addAttribute("userId", userId);
@@ -585,7 +585,7 @@ public class TeamController {
 
     @DeleteMapping("/team/bookmark")
     @ResponseBody
-    public ResponseEntity<?> deleteBookmark(@RequestParam("teamId")Long teamId) {
+    public ResponseEntity<?> deleteBookmark(@RequestParam("teamId") Long teamId) {
 
         UserProfile currentUser = validationService.getUserData();
 
@@ -598,5 +598,29 @@ public class TeamController {
         teamService.deleteBookmark(userId, teamId);
 
         return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/team/deleteTeam/{teamId}")
+    @ResponseBody
+    public ResponseEntity<?> deleteTeam(@PathVariable("teamId") Long teamId) {
+
+        UserProfile currentUser = validationService.getUserData();
+
+        if (currentUser == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Long userId = currentUser.getUserId();
+        Long masterId = teamService.findTeamMasterId(teamId);
+
+        if (!userId.equals(masterId)) {
+            return ResponseEntity.notFound().build();
+        }
+
+        teamService.deleteTeam(teamId);
+
+        return ResponseEntity.ok().build();
+
+
     }
 }

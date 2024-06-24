@@ -15,4 +15,6 @@ public interface BookmarkRepository extends JpaRepository<Bookmark, BookmarkPK> 
     @Query("SELECT b FROM Bookmark b WHERE b.userId =:userId")
     List<Bookmark> findBookmarkByUserId(@Param("userId") Long userId);
 
+    @Modifying
+    void deleteByTeamId(Long teamId);
 }

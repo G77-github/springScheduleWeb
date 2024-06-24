@@ -32,4 +32,8 @@ public interface EventJoinRepository extends JpaRepository<EventJoin, Long> {
     @Modifying
     @Query("DELETE FROM EventJoin ej WHERE ej.userId =:userId")
     void deleteByUserId(@Param("userId") Long userId);
+
+    @Modifying
+    @Query("DELETE FROM EventJoin ej WHERE ej.eventId IN :eventIds")
+    void deleteByEventIds(@Param("eventIds") List<Long> eventIds);
 }

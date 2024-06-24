@@ -39,4 +39,7 @@ public interface TeamJoinRepository extends JpaRepository<TeamJoin, TeamJoinPK> 
     void deleteByUserId(@Param("userId") Long userId);
 
 
+    @Modifying
+    void deleteByTeamId(Long teamId);
+
 }

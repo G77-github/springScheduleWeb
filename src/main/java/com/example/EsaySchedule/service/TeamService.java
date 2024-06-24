@@ -23,6 +23,8 @@ public class TeamService {
     private final UserProfileRepository userProfileRepository;
     private final ImageRepository imageRepository;
     private final BookmarkRepository bookmarkRepository;
+    private final EventRepository eventRepository;
+    private final EventJoinRepository eventJoinRepository;
 
     public Team save(AddTeamRequest addTeamRequest) {
         return teamRepository.save(addTeamRequest.toEntity());
@@ -96,7 +98,7 @@ public class TeamService {
     }
 
     @Transactional
-    public void joinTeam(Long userId, Long teamId) {
+    public void  joinTeam(Long userId, Long teamId) {
         TeamJoin teamJoin = TeamJoin.builder()
                                     .userId(userId)
                                     .teamId(teamId)
@@ -238,4 +240,17 @@ public class TeamService {
         return bookmarkRepository.findById(new BookmarkPK(userId, teamId));
     }
 
+    @Transactional
+    public void deleteTeam(Long teamId) {
+        imageRepository.deleteByTeamId(teamId);
+        teamJoinRepository.deleteByTeamId(teamId);
+        List<Event> events = eventRepository.findByTeamId(teamId);
+        List<Long> eventIds = new ArrayList<>();
+        events.stream().map(event -> eventIds.add(event.getEventId()));
+        eventJoinRepository.deleteByEventIds(eventIds);
+        eventRepository.deleteByTeamId(teamId);
+        bookmarkRepository.deleteByTeamId(teamId);
+        teamRepository.deleteById(teamId);
+
+    }
 }
